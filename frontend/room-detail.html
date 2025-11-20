@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết phòng - Cocotier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .room-card {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="room-card">
+        <!-- Room Image -->
+        <div class="relative h-64 bg-gradient-to-br from-gray-300 to-gray-400" id="roomImageContainer">
+            <img id="roomImage" src="" alt="Room Image" class="w-full h-full object-cover">
+            <div class="absolute top-4 left-4 right-4 flex justify-between items-center">
+                <button onclick="history.back()" class="w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                <button class="w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all">
+                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="absolute bottom-4 left-4 text-white">
+                <h2 class="text-2xl font-bold" id="roomTitle">Tên phòng</h2>
+                <p class="text-lg font-semibold" id="roomPrice">₫0/đêm</p>
+            </div>
+            <div class="absolute bottom-4 right-4 bg-white bg-opacity-90 rounded-full px-3 py-1">
+                <span class="text-sm font-medium text-gray-800" id="roomRating">8+</span>
+            </div>
+        </div>
+
+        <!-- Room Info -->
+        <div class="p-6">
+            <!-- Distance and Rating -->
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center text-sm text-gray-600">
+                    <div class="w-4 h-4 bg-red-500 rounded-full mr-2"></div>
+                    <span id="roomDistance">Trung tâm thành phố</span>
+                </div>
+                <div class="flex items-center">
+                    <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                    </svg>
+                    <span class="text-sm font-medium" id="roomStarRating">4.8</span>
+                    <span class="text-sm text-gray-500 ml-1">Ratings</span>
+                </div>
+            </div>
+
+            <!-- What this place offers -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-lg font-semibold text-gray-900">Tiện ích phòng</h3>
+                    <button class="text-blue-600 text-sm font-medium">Xem tất cả</button>
+                </div>
+                <div class="grid grid-cols-4 gap-4">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xs text-gray-600">WiFi</span>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xs text-gray-600">Clinic</span>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xs text-gray-600">Park</span>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xs text-gray-600">Pool</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Mô tả</h3>
+                <p class="text-gray-600 text-sm leading-relaxed" id="roomDescription">
+                    Phòng thoải mái với thiết kế hiện đại và đầy đủ tiện nghi.
+                </p>
+            </div>
+
+            <!-- Book Now Button -->
+            <button onclick="bookRoom()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-blue-700 transition-colors">
+                Book Now
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001/api';
+        
+        // Room images by type
+        const roomImages = {
+            'Phòng Đơn': 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop',
+            'Phòng Đôi': 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=400&h=300&fit=crop',
+            'Phòng Gia Đình': 'https://images.unsplash.com/photo-1591088398332-8a7791972843?w=400&h=300&fit=crop'
+        };
+
+        async function loadRoomDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomId = urlParams.get('id');
+            
+            if (!roomId) {
+                alert('Không tìm thấy thông tin phòng');
+                history.back();
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/rooms`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                let rooms = [];
+                if (response.ok) {
+                    const data = await response.json();
+                    rooms = data.rooms || [];
+                } else {
+                    // Fallback mock data
+                    rooms = [
+                        { id: 1, number: '101', type: 'Phòng Đơn', price: 220000, capacity: 1, beds_count: 1 },
+                        { id: 2, number: '102', type: 'Phòng Đơn', price: 500000, capacity: 1, beds_count: 1 },
+                        { id: 6, number: '201', type: 'Phòng Đôi', price: 700000, capacity: 2, beds_count: 1 },
+                        { id: 11, number: '301', type: 'Phòng Gia Đình', price: 1300000, capacity: 4, beds_count: 2 }
+                    ];
+                }
+                
+                const room = rooms.find(r => r.id == roomId);
+                if (room) {
+                    displayRoomDetail(room);
+                } else {
+                    alert('Không tìm thấy phòng');
+                    history.back();
+                }
+            } catch (error) {
+                console.error('Error loading room detail:', error);
+            }
+        }
+
+        function displayRoomDetail(room) {
+            // Cập nhật hình ảnh
+            const roomImage = document.getElementById('roomImage');
+            roomImage.src = roomImages[room.type] || roomImages['Phòng Gia Đình'];
+            
+            // Cập nhật thông tin trong overlay
+            document.getElementById('roomTitle').textContent = room.name || room.type;
+            document.getElementById('roomPrice').textContent = '₫' + room.price.toLocaleString('vi-VN') + '/night';
+            document.getElementById('roomRating').textContent = Math.floor(Math.random() * 3 + 8) + '+';
+            
+            // Cập nhật distance và rating
+            document.getElementById('roomDistance').textContent = `${room.capacity} người • ${room.type}`;
+            document.getElementById('roomStarRating').textContent = '4.' + Math.floor(Math.random() * 9 + 1);
+            
+            // Cập nhật mô tả
+            let description = `Phòng ${room.type.toLowerCase()} thoải mái với thiết kế hiện đại, đầy đủ tiện nghi cao cấp. Phù hợp cho ${room.capacity} người lưu trú.`;
+            if (room.description) {
+                description = room.description;
+            }
+            document.getElementById('roomDescription').textContent = description;
+            
+            // Store room data for booking
+            window.currentRoom = room;
+        }
+
+        function bookRoom() {
+            if (!window.currentRoom) {
+                alert('Không có thông tin phòng');
+                return;
+            }
+            
+            // Check if user is logged in
+            const token = localStorage.getItem('token');
+            if (!token) {
+                if (confirm('Bạn cần đăng nhập để đặt phòng. Chuyển đến trang đăng nhập?')) {
+                    window.location.href = 'index.html';
+                }
+                return;
+            }
+            
+            // Redirect to booking page with room info
+            localStorage.setItem('selectedRoom', JSON.stringify(window.currentRoom));
+            window.location.href = 'bookings.html';
+        }
+
+        // Load room detail on page load
+        loadRoomDetail();
+    </script>
+</body>
+</html>

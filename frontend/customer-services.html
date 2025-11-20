@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dịch vụ khách sạn - Khách sạn Cây Dừa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .service-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            background: white;
+        }
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <button onclick="window.history.back()" class="mr-3 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <a href="dashboard.html" class="mr-3">
+                        <div class="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-green-600 text-lg font-bold">🌴</div>
+                    </a>
+                    <h1 class="text-xl font-semibold">Dịch vụ khách sạn</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-600" id="userInfo"></span>
+                    <button onclick="logout()" class="text-red-600 hover:text-red-700">Đăng xuất</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto py-6 px-4">
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Dịch vụ có sẵn</h2>
+            <p class="text-gray-600">Liên hệ lễ tân để đặt dịch vụ</p>
+        </div>
+
+        <!-- Service Categories -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+            <button class="service-category active" data-category="all">
+                <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center text-white text-xl mb-2 mx-auto">
+                    ✓
+                </div>
+                <span class="text-sm font-medium">Tất cả</span>
+            </button>
+            <button class="service-category" data-category="food">
+                <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-xl mb-2 mx-auto">
+                    🍽️
+                </div>
+                <span class="text-sm">Ăn uống</span>
+            </button>
+            <button class="service-category" data-category="transport">
+                <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-xl mb-2 mx-auto">
+                    🚗
+                </div>
+                <span class="text-sm">Vận chuyển</span>
+            </button>
+            <button class="service-category" data-category="spa">
+                <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-xl mb-2 mx-auto">
+                    💆
+                </div>
+                <span class="text-sm">Spa & Massage</span>
+            </button>
+            <button class="service-category" data-category="laundry">
+                <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-xl mb-2 mx-auto">
+                    👕
+                </div>
+                <span class="text-sm">Giặt ủi</span>
+            </button>
+            <button class="service-category" data-category="other">
+                <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-xl mb-2 mx-auto">
+                    ⭐
+                </div>
+                <span class="text-sm">Khác</span>
+            </button>
+        </div>
+
+        <div id="servicesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Services will be loaded here -->
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        const API_URL = AppConfig.getApiUrl();
+        
+        // Hàm format tiền tệ giống admin
+        function formatCurrency(amount) {
+            if (!amount || isNaN(amount)) return '0 VND';
+            let numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+            
+            // Nếu số quá nhỏ (< 1000), nhân với 1000 để có định dạng hợp lý
+            if (numAmount < 1000 && numAmount > 0) {
+                numAmount = numAmount * 1000;
+            }
+            
+            return new Intl.NumberFormat('vi-VN').format(numAmount) + ' VND';
+        }
+
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            document.getElementById('userInfo').textContent = user.name || user.username;
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
+        // Service category functionality
+        document.querySelectorAll('.service-category').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.service-category').forEach(btn => {
+                    btn.classList.remove('active');
+                    const icon = btn.querySelector('div');
+                    icon.classList.remove('bg-green-600', 'text-white');
+                    icon.classList.add('bg-gray-200', 'text-gray-600');
+                });
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                const icon = button.querySelector('div');
+                icon.classList.remove('bg-gray-200', 'text-gray-600');
+                icon.classList.add('bg-green-600', 'text-white');
+                
+                // Filter services
+                const category = button.getAttribute('data-category');
+                filterServices(category);
+            });
+        });
+
+        async function loadServices() {
+            try {
+                console.log('🔄 Loading services...');
+                console.log('🌐 API URL:', API_URL);
+                
+                const response = await fetch(`${API_URL}/services`);
+                console.log('📡 Services response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Loaded services:', data.services ? data.services.length : 0);
+                    
+                    if (!data.services || data.services.length === 0) {
+                        document.getElementById('servicesGrid').innerHTML = `
+                            <div class="col-span-full text-center py-8">
+                                <p class="text-gray-500">Không có dịch vụ nào</p>
+                                <button onclick="loadServices()" class="mt-4 px-4 py-2 bg-green-600 text-white rounded-md">Thử lại</button>
+                            </div>
+                        `;
+                    } else {
+                        displayServices(data.services);
+                    }
+                } else {
+                    console.error('❌ Failed to load services:', response.status);
+                    const errorText = await response.text();
+                    console.error('❌ Error response:', errorText);
+                    
+                    document.getElementById('servicesGrid').innerHTML = `
+                        <div class="col-span-full text-center py-8">
+                            <p class="text-red-500">Lỗi tải dữ liệu dịch vụ (${response.status})</p>
+                            <button onclick="loadServices()" class="mt-4 px-4 py-2 bg-green-600 text-white rounded-md">Thử lại</button>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('❌ Error loading services:', error);
+                document.getElementById('servicesGrid').innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <p class="text-red-500">Lỗi kết nối: ${error.message}</p>
+                        <button onclick="loadServices()" class="mt-4 px-4 py-2 bg-green-600 text-white rounded-md">Thử lại</button>
+                    </div>
+                `;
+            }
+        }
+
+        function displayServices(services) {
+            const grid = document.getElementById('servicesGrid');
+            
+            if (services.length === 0) {
+                grid.innerHTML = '<p class="text-gray-500 text-center col-span-2">Chưa có dịch vụ nào</p>';
+                return;
+            }
+            
+            grid.innerHTML = services.map(service => `
+                <div class="service-card" data-category="${service.category}">
+                    <div class="flex items-start space-x-4">
+                        <div class="service-icon ${getServiceIconClass(service.category)}">
+                            ${getServiceIcon(service.category)}
+                        </div>
+                        <div class="flex-1">
+                            <h5 class="font-semibold text-gray-900 mb-1">${service.name}</h5>
+                            <p class="text-sm text-gray-600 mb-2">${service.description || 'Dịch vụ chất lượng cao'}</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-lg font-bold text-green-600">${formatCurrency(service.price)}</span>
+                                <span class="text-sm text-gray-500">Liên hệ lễ tân</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getServiceIcon(category) {
+            const icons = {
+                'food': '🍽️',
+                'transport': '🚗', 
+                'spa': '💆',
+                'laundry': '👕',
+                'other': '⭐'
+            };
+            return icons[category] || '⭐';
+        }
+
+        function getServiceIconClass(category) {
+            const classes = {
+                'food': 'bg-orange-100 text-orange-600',
+                'transport': 'bg-blue-100 text-blue-600',
+                'spa': 'bg-purple-100 text-purple-600', 
+                'laundry': 'bg-cyan-100 text-cyan-600',
+                'other': 'bg-gray-100 text-gray-600'
+            };
+            return classes[category] || 'bg-gray-100 text-gray-600';
+        }
+
+        function filterServices(category) {
+            const serviceCards = document.querySelectorAll('.service-card');
+            serviceCards.forEach(card => {
+                if (category === 'all' || card.getAttribute('data-category') === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize
+        checkAuth();
+        loadServices();
+    </script>
+</body>
+</html>

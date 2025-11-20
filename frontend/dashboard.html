@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Khách sạn Cocotier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="animations.css">
+    <link rel="stylesheet" href="cocotier-logo-image.css">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-sm border-b animate-slide-in-down">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="cocotier-logo-img animate-fade-in delay-100">
+                        <div class="logo-temp logo-temp-large"></div>
+                        <span class="logo-text-img logo-text-img-large">COCOTIER</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="userName" class="text-gray-700 animate-fade-in delay-300"></span>
+                    <button onclick="logout()" class="text-red-600 hover:text-red-700 smooth-transition btn-hover-scale">Đăng xuất</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 py-6 sm:px-0">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white overflow-hidden shadow rounded-lg card-hover animate-fade-in delay-100">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white float">📅</div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Đặt phòng của tôi</dt>
+                                    <dd class="text-lg font-medium text-gray-900" id="myBookings" data-stat="my-bookings">0</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow rounded-lg card-hover animate-fade-in delay-200">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white float">🏨</div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Phòng trống</dt>
+                                    <dd class="text-lg font-medium text-gray-900" id="availableRooms" data-stat="available-rooms">0</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow rounded-lg card-hover animate-fade-in delay-300">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white float">⭐</div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Đánh giá của tôi</dt>
+                                    <dd class="text-lg font-medium text-gray-900" id="myFeedbacks" data-stat="my-feedbacks">0</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow rounded-lg card-hover animate-fade-in delay-400">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white float">🛎️</div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Dịch vụ có sẵn</dt>
+                                    <dd class="text-lg font-medium text-gray-900" id="totalServices" data-stat="services">0</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2">
+                    <div class="bg-white shadow rounded-lg p-6 animate-slide-in-up delay-500">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Menu chức năng</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <a href="room-list.html" class="stagger-item flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 card-hover smooth-transition">
+                                <div class="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center text-white mb-2 btn-hover-scale">👁️</div>
+                                <span class="text-sm font-medium">Xem phòng</span>
+                            </a>
+                            <a href="bookings.html" class="stagger-item flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 card-hover smooth-transition">
+                                <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white mb-2 btn-hover-scale">📅</div>
+                                <span class="text-sm font-medium">Đặt phòng</span>
+                            </a>
+                            <a href="booking-history.html" class="stagger-item flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 card-hover smooth-transition">
+                                <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white mb-2 btn-hover-scale">📋</div>
+                                <span class="text-sm font-medium">Lịch sử đặt phòng</span>
+                            </a>
+                            <a href="feedback.html" class="stagger-item flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 card-hover smooth-transition">
+                                <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white mb-2 btn-hover-scale">⭐</div>
+                                <span class="text-sm font-medium">Đánh giá dịch vụ</span>
+                            </a>
+                            <a href="customer-services.html" class="stagger-item flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 card-hover smooth-transition">
+                                <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white mb-2 btn-hover-scale">🛎️</div>
+                                <span class="text-sm font-medium">Dịch vụ khách sạn</span>
+                            </a>
+                            <a href="profile.html" class="stagger-item flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 card-hover smooth-transition">
+                                <div class="w-12 h-12 bg-gray-500 rounded-full flex items-center justify-center text-white mb-2 btn-hover-scale">👤</div>
+                                <span class="text-sm font-medium">Tài khoản của tôi</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white shadow rounded-lg p-6 animate-slide-in-up delay-600">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Hoạt động gần đây</h3>
+                    <div id="recentActivities" class="space-y-3">
+                        <!-- Activities will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Room Detail Modal -->
+    <div id="roomDetailModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+                <!-- Room Image -->
+                <div class="relative h-64 bg-gradient-to-br from-gray-300 to-gray-400" id="roomDetailImage">
+                    <div class="absolute top-4 left-4 right-4 flex justify-between items-center">
+                        <button onclick="hideRoomDetailModal()" class="w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <button class="w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all">
+                            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="absolute bottom-4 left-4 text-white">
+                        <h2 class="text-2xl font-bold" id="roomDetailName">Tên phòng</h2>
+                        <p class="text-lg font-semibold" id="roomDetailPrice">₫0/night</p>
+                    </div>
+                    <div class="absolute bottom-4 right-4 bg-white bg-opacity-90 rounded-full px-3 py-1">
+                        <span class="text-sm font-medium text-gray-800" id="roomDetailRating">8+</span>
+                    </div>
+                </div>
+
+                <!-- Room Info -->
+                <div class="p-6">
+                    <!-- Distance and Rating -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <div class="w-4 h-4 bg-red-500 rounded-full mr-2"></div>
+                            <span id="roomDetailDistance">Trung tâm thành phố</span>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            <span class="text-sm font-medium" id="roomDetailStarRating">4.8</span>
+                            <span class="text-sm text-gray-500 ml-1">Ratings</span>
+                        </div>
+                    </div>
+
+                    <!-- What this place offers -->
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-semibold text-gray-900">Tiện ích phòng</h3>
+                            <button class="text-blue-600 text-sm font-medium">Xem tất cả</button>
+                        </div>
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-xs text-gray-600">WiFi</span>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-xs text-gray-600">Clinic</span>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-xs text-gray-600">Park</span>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-xs text-gray-600">Pool</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Mô tả</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed" id="roomDetailDescription">
+                            Phòng thoải mái với thiết kế hiện đại và đầy đủ tiện nghi.
+                        </p>
+                    </div>
+
+                    <!-- Book Now Button -->
+                    <button onclick="bookRoomFromModal()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-blue-700 transition-colors">
+                        Book Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/cache-manager.js"></script>
+    <script>
+        const API_URL = AppConfig.getApiUrl();
+        
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            document.getElementById('userName').textContent = user.name || 'Khách hàng';
+        }
+        
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+        
+        async function loadDashboardData() {
+            const token = localStorage.getItem('token');
+            try {
+                // Use cache manager for fetching
+                const response = await CacheManager.fetchWithCacheBusting(`${API_URL}/dashboard/stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('availableRooms').textContent = data.availableRooms || 0;
+                    document.getElementById('totalServices').textContent = data.totalServices || 0;
+                    document.getElementById('myBookings').textContent = data.myBookings || 0;
+                    document.getElementById('myFeedbacks').textContent = data.myFeedbacks || 0;
+                }
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+        
+        async function loadRecentActivities() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await CacheManager.fetchWithCacheBusting(`${API_URL}/dashboard/activities`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayRecentActivities(data.activities || []);
+                }
+            } catch (error) {
+                console.error('Error loading activities:', error);
+                displayRecentActivities([]);
+            }
+        }
+        
+        function displayRecentActivities(activities) {
+            const container = document.getElementById('recentActivities');
+            
+            if (activities.length === 0) {
+                // Hiển thị hoạt động mẫu
+                const sampleActivities = [
+                    {
+                        icon: '📅',
+                        title: 'Chào mừng bạn!',
+                        description: 'Hãy bắt đầu bằng việc đặt phòng đầu tiên',
+                        time: new Date().toISOString(),
+                        status: 'info'
+                    },
+                    {
+                        icon: '🏨',
+                        title: 'Khám phá phòng',
+                        description: 'Xem danh sách phòng có sẵn',
+                        time: new Date().toISOString(),
+                        status: 'info'
+                    }
+                ];
+                
+                container.innerHTML = sampleActivities.map(activity => {
+                    const statusColor = getActivityStatusColor(activity.status);
+                    
+                    return `
+                        <div class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-md">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 ${statusColor} rounded-full flex items-center justify-center text-white text-sm">
+                                    ${activity.icon}
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900">${activity.title}</p>
+                                <p class="text-xs text-gray-500">${activity.description}</p>
+                                <p class="text-xs text-gray-400 mt-1">Vừa xông</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                return;
+            }
+            
+            container.innerHTML = activities.map(activity => {
+                const timeAgo = getTimeAgo(activity.time);
+                const statusColor = getActivityStatusColor(activity.status);
+                
+                return `
+                    <div class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-md">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 ${statusColor} rounded-full flex items-center justify-center text-white text-sm">
+                                ${activity.icon}
+                            </div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900">${activity.title}</p>
+                            <p class="text-xs text-gray-500">${activity.description}</p>
+                            <p class="text-xs text-gray-400 mt-1">${timeAgo}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function getActivityStatusColor(status) {
+            switch(status) {
+                case 'pending': return 'bg-yellow-500';
+                case 'confirmed': return 'bg-green-500';
+                case 'checked_in': return 'bg-blue-500';
+                case 'checked_out': return 'bg-gray-500';
+                case 'cancelled': return 'bg-red-500';
+                case 'completed': return 'bg-purple-500';
+                case 'info': return 'bg-indigo-500';
+                default: return 'bg-gray-400';
+            }
+        }
+        
+        function getTimeAgo(dateString) {
+            const now = new Date();
+            const date = new Date(dateString);
+            const diffInSeconds = Math.floor((now - date) / 1000);
+            
+            if (diffInSeconds < 60) return 'Vừa xông';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} phút trước`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} giờ trước`;
+            if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} ngày trước`;
+            return date.toLocaleDateString('vi-VN');
+        }
+        
+        checkAuth();
+        loadDashboardData();
+        loadRecentActivities();
+        
+        // Check if need to refresh after booking/feedback
+        if (localStorage.getItem('refreshDashboard') === 'true') {
+            localStorage.removeItem('refreshDashboard');
+            // Immediate update
+            loadDashboardData();
+            loadRecentActivities();
+        }
+        
+        // Tự động refresh hoạt động mỗi 10 giây
+        setInterval(() => {
+            loadRecentActivities();
+            loadDashboardData();
+        }, 10000);
+        
+        // Room Detail Modal Functions
+        let currentModalRoom = null;
+        
+        function showRoomDetailModal(room) {
+            currentModalRoom = room;
+            
+            // Cập nhật thông tin trong modal
+            document.getElementById('roomDetailName').textContent = room.name || room.type;
+            document.getElementById('roomDetailPrice').textContent = '₫' + room.price.toLocaleString('vi-VN') + '/night';
+            document.getElementById('roomDetailRating').textContent = Math.floor(Math.random() * 3 + 8) + '+';
+            document.getElementById('roomDetailDistance').textContent = `${room.capacity} người • ${room.type}`;
+            document.getElementById('roomDetailStarRating').textContent = '4.' + Math.floor(Math.random() * 9 + 1);
+            
+            // Cập nhật mô tả
+            let description = `Phòng ${room.type.toLowerCase()} thoải mái với thiết kế hiện đại, đầy đủ tiện nghi cao cấp. Phù hợp cho ${room.capacity} người lưu trú.`;
+            if (room.description) {
+                description = room.description;
+            }
+            document.getElementById('roomDetailDescription').textContent = description;
+            
+            // Cập nhật hình ảnh
+            const imageElement = document.getElementById('roomDetailImage');
+            if (room.image) {
+                imageElement.style.backgroundImage = `url('${room.image}')`;
+                imageElement.style.backgroundSize = 'cover';
+                imageElement.style.backgroundPosition = 'center';
+            } else {
+                const gradients = {
+                    'Đơn': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    'Đôi': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                    'Gia Đình': 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                    'VIP': 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
+                };
+                imageElement.style.backgroundImage = gradients[room.type] || gradients['Đơn'];
+            }
+            
+            // Hiển thị modal
+            document.getElementById('roomDetailModal').classList.remove('hidden');
+        }
+        
+        function hideRoomDetailModal() {
+            document.getElementById('roomDetailModal').classList.add('hidden');
+            currentModalRoom = null;
+        }
+        
+        function bookRoomFromModal() {
+            if (!currentModalRoom) {
+                alert('Không có thông tin phòng');
+                return;
+            }
+            
+            localStorage.setItem('selectedRoom', JSON.stringify(currentModalRoom));
+            window.location.href = 'bookings.html';
+        }
+        
+        // Đóng modal khi click bên ngoài
+        document.getElementById('roomDetailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideRoomDetailModal();
+            }
+        });
+    </script>
+</body>
+</html>

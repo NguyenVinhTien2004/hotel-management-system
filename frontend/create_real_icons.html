@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tạo Icon PWA Thực</title>
+</head>
+<body>
+    <h2>Tạo Icon PWA cho Khách sạn</h2>
+    <canvas id="canvas192" width="192" height="192" style="border:1px solid #000; margin: 10px;"></canvas>
+    <canvas id="canvas512" width="512" height="512" style="border:1px solid #000; margin: 10px;"></canvas>
+    <br>
+    <button onclick="downloadIcons()">Tải xuống Icons</button>
+    <p>Sau khi tải xuống, copy 2 file vào thư mục images/</p>
+
+    <script>
+        function createIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#4CAF50');
+            gradient.addColorStop(1, '#2E7D32');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Hotel building
+            const buildingWidth = size * 0.5;
+            const buildingHeight = size * 0.4;
+            const buildingX = (size - buildingWidth) / 2;
+            const buildingY = size * 0.4;
+            
+            ctx.fillStyle = 'white';
+            ctx.fillRect(buildingX, buildingY, buildingWidth, buildingHeight);
+            
+            // Windows
+            const windowSize = size * 0.06;
+            const windowSpacing = size * 0.02;
+            ctx.fillStyle = '#4CAF50';
+            
+            for (let row = 0; row < 2; row++) {
+                for (let col = 0; col < 4; col++) {
+                    const x = buildingX + windowSpacing + col * (windowSize + windowSpacing);
+                    const y = buildingY + windowSpacing + row * (windowSize + windowSpacing);
+                    ctx.fillRect(x, y, windowSize, windowSize);
+                }
+            }
+            
+            // Door
+            const doorWidth = size * 0.08;
+            const doorHeight = size * 0.12;
+            const doorX = buildingX + (buildingWidth - doorWidth) / 2;
+            const doorY = buildingY + buildingHeight - doorHeight;
+            
+            ctx.fillStyle = '#2E7D32';
+            ctx.fillRect(doorX, doorY, doorWidth, doorHeight);
+            
+            // Text
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size * 0.12}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText('HOTEL', size / 2, size * 0.25);
+        }
+        
+        // Tạo icons
+        createIcon(document.getElementById('canvas192'), 192);
+        createIcon(document.getElementById('canvas512'), 512);
+        
+        function downloadIcons() {
+            // Download 192x192
+            const link192 = document.createElement('a');
+            link192.download = 'icon-192.png';
+            link192.href = document.getElementById('canvas192').toDataURL('image/png');
+            link192.click();
+            
+            // Download 512x512
+            setTimeout(() => {
+                const link512 = document.createElement('a');
+                link512.download = 'icon-512.png';
+                link512.href = document.getElementById('canvas512').toDataURL('image/png');
+                link512.click();
+            }, 1000);
+            
+            alert('Icons đã được tạo! Hãy copy 2 file vào thư mục images/ và cập nhật manifest.json');
+        }
+    </script>
+</body>
+</html>

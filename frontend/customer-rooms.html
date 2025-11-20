@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách phòng - Khách sạn Cocotier</title>
+    <link rel="icon" href="images/icon-192.png">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            height: calc(100vh - 40px);
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .menu-icon {
+            width: 35px;
+            height: 35px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .location {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .greeting {
+            margin-bottom: 20px;
+        }
+
+        .greeting h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .greeting p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: none;
+            background: #f8f9fa;
+            border-radius: 15px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #4285f4;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .city-list {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .city-item {
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .city-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .city-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 8px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .city-name {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .hotel-list {
+            flex: 1;
+            overflow-y: auto;
+            height: calc(100vh - 350px);
+        }
+
+        .hotel-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .hotel-item:hover {
+            background: #f8f9fa;
+            margin: 0 -15px;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .hotel-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            background: linear-gradient(45deg, #ddd, #eee);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hotel-info h4 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .hotel-info p {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .hotel-price {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4285f4;
+        }
+
+        .view-more {
+            text-align: right;
+            margin-top: 15px;
+        }
+
+        .view-more a {
+            color: #4285f4;
+            font-size: 14px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            max-width: 450px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            position: relative;
+            height: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .modal-header-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .modal-close-btn, .modal-heart-btn {
+            width: 35px;
+            height: 35px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .modal-close-btn:hover, .modal-heart-btn:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+
+        .modal-title {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+        }
+
+        .modal-title h3 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .modal-title .price {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-rating-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .modal-distance {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .modal-rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal-amenities {
+            margin-bottom: 25px;
+        }
+
+        .modal-amenities-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .modal-amenity-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-amenity-item:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .modal-amenity-icon {
+            width: 30px;
+            height: 30px;
+            margin: 0 auto 8px;
+            background: #4285f4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .modal-amenity-name {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .modal-description {
+            margin-bottom: 25px;
+        }
+
+        .modal-description p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .modal-book-btn {
+            width: 100%;
+            padding: 15px;
+            background: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-book-btn:hover {
+            background: #3367d6;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(66, 133, 244, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="menu-icon" onclick="goBack()">←</div>
+            <div class="location">
+                <i class='bx bx-map'></i>
+                <span>Hà Nội, Việt Nam</span>
+            </div>
+            <div class="profile-pic" onclick="viewProfile()">
+                <span id="userInitials">KH</span>
+            </div>
+        </div>
+
+        <div class="greeting">
+            <h2 id="userGreeting">Xin chào Khách hàng,</h2>
+            <p>Khám phá những khách sạn tuyệt vời</p>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm khách sạn...">
+            <div class="search-icon" onclick="searchRooms()">
+                <i class='bx bx-search'></i>
+            </div>
+        </div>
+
+        <div class="section-title">Khám phá thành phố</div>
+        <div class="city-list">
+            <div class="city-item" onclick="filterByCity('hanoi')">
+                <div class="city-icon" style="background: linear-gradient(45deg, #ff6b6b, #ee5a24);"></div>
+                <div class="city-name">Hà Nội</div>
+            </div>
+            <div class="city-item" onclick="filterByCity('hcm')">
+                <div class="city-icon" style="background: linear-gradient(45deg, #4834d4, #686de0);"></div>
+                <div class="city-name">TP.HCM</div>
+            </div>
+            <div class="city-item" onclick="filterByCity('danang')">
+                <div class="city-icon" style="background: linear-gradient(45deg, #00d2d3, #54a0ff);"></div>
+                <div class="city-name">Đà Nẵng</div>
+            </div>
+        </div>
+
+        <div class="section-title">Phòng có sẵn</div>
+        <div class="hotel-list" id="roomsList">
+            <div style="text-align: center; padding: 20px; color: #666;">Đang tải...</div>
+        </div>
+
+        <div class="view-more">
+            <a href="customer-room-detail.html">Xem tất cả →</a>
+        </div>
+    </div>
+
+    <!-- Room Detail Modal -->
+    <div class="modal-overlay" id="roomModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalRoomImage" style="background-image: url('images/phong-don/OIP.jfif'); background-size: cover; background-position: center;">
+                <div class="modal-header-overlay">
+                    <button class="modal-close-btn" onclick="closeModal()">
+                        <i class='bx bx-x'></i>
+                    </button>
+                    <button class="modal-heart-btn" onclick="toggleFavorite()">
+                        <i class='bx bx-heart'></i>
+                    </button>
+                </div>
+                <div class="modal-title">
+                    <h3 id="modalRoomName">Tên phòng</h3>
+                    <div class="price" id="modalRoomPrice">₫0/đêm</div>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <div class="modal-rating-section">
+                    <div class="modal-distance">
+                        <i class='bx bx-map-pin' style="color: #ff6b6b;"></i>
+                        <span id="modalRoomLocation">1 người • Đơn</span>
+                    </div>
+                    <div class="modal-rating">
+                        <i class='bx bxs-star' style="color: #ffc107;"></i>
+                        <span id="modalRoomRating">4.1 Ratings</span>
+                    </div>
+                </div>
+
+                <div class="modal-amenities">
+                    <div class="modal-section-title">Tiện ích phòng</div>
+                    <div class="modal-amenities-grid">
+                        <div class="modal-amenity-item">
+                            <div class="modal-amenity-icon"><i class='bx bx-wifi'></i></div>
+                            <div class="modal-amenity-name">WiFi</div>
+                        </div>
+                        <div class="modal-amenity-item">
+                            <div class="modal-amenity-icon"><i class='bx bx-building-house'></i></div>
+                            <div class="modal-amenity-name">Clinic</div>
+                        </div>
+                        <div class="modal-amenity-item">
+                            <div class="modal-amenity-icon"><i class='bx bx-car'></i></div>
+                            <div class="modal-amenity-name">Park</div>
+                        </div>
+                        <div class="modal-amenity-item">
+                            <div class="modal-amenity-icon"><i class='bx bx-swim'></i></div>
+                            <div class="modal-amenity-name">Pool</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-description">
+                    <div class="modal-section-title">Mô tả</div>
+                    <p id="modalRoomDescription">Phòng đơn thoải mái với thiết kế hiện đại, đầy đủ tiện nghi cao cấp. Phù hợp cho 1 người lưu trú.</p>
+                </div>
+
+                <button class="modal-book-btn" onclick="bookSelectedRoom()">
+                    Đặt phòng ngay
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        const API_URL = AppConfig.getApiUrl();
+        let currentUser = null;
+        let allRooms = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadRooms();
+        });
+
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            if (!token || !user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            currentUser = JSON.parse(user);
+            document.getElementById('userGreeting').textContent = `Xin chào ${currentUser.name},`;
+            document.getElementById('userInitials').textContent = currentUser.name.charAt(0).toUpperCase();
+        }
+
+        async function loadRooms() {
+            try {
+                const response = await fetch(`${API_URL}/rooms`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    allRooms = Array.isArray(data) ? data : (data.rooms || []);
+                    console.log('LOADED ROOMS:', allRooms);
+                    allRooms.forEach(room => {
+                        console.log(`Room ID ${room.id}: ${room.name} - Image: ${room.image}`);
+                    });
+                    displayRooms(allRooms);
+                } else {
+                    console.error('Failed to load rooms');
+                    allRooms = [];
+                }
+            } catch (error) {
+                console.error('Error loading rooms:', error);
+                allRooms = [];
+            }
+        }
+
+        function displayRooms(rooms) {
+            const roomsList = document.getElementById('roomsList');
+            
+            if (rooms.length === 0) {
+                roomsList.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Không có phòng nào</div>';
+                return;
+            }
+            
+            console.log('Displaying rooms:', rooms.slice(0, 5));
+            
+            roomsList.innerHTML = rooms.slice(0, 5).map(room => {
+                console.log(`Room ${room.id}: ${room.name}, Image: ${room.image}`);
+                return `
+                    <div class="hotel-item" onclick="selectRoom(${room.id})">
+                        <div class="hotel-image" style="background-image: url('${room.image || 'images/placeholder.jpg'}'); background-size: cover; background-position: center;"></div>
+                        <div class="hotel-info">
+                            <h4>${room.name}</h4>
+                            <p>⭐ 4.${Math.floor(Math.random() * 9) + 1} • ${room.type}</p>
+                            <div class="hotel-price">${formatPrice(room.price)}/đêm</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        let selectedRoom = null;
+
+        function selectRoom(roomId) {
+            const room = allRooms.find(r => r.id === roomId);
+            console.log('SELECTED ROOM:', room);
+            console.log('ROOM IMAGE:', room?.image);
+            if (room) {
+                selectedRoom = room;
+                showRoomModal(room);
+            }
+        }
+
+        function showRoomModal(room) {
+            alert('ROOM ID: ' + room.id + ' - IMAGE: ' + room.image);
+            
+            // Update modal content
+            document.getElementById('modalRoomName').textContent = room.name;
+            document.getElementById('modalRoomPrice').textContent = formatPrice(room.price) + '/đêm';
+            document.getElementById('modalRoomLocation').textContent = `1 người • ${room.type}`;
+            document.getElementById('modalRoomRating').textContent = `4.${Math.floor(Math.random() * 9) + 1} Ratings`;
+            document.getElementById('modalRoomDescription').textContent = room.description || 'Phòng đơn thoải mái với thiết kế hiện đại, đầy đủ tiện nghi cao cấp. Phù hợp cho 1 người lưu trú.';
+            
+            // Tạo hình ảnh khác nhau cho từng phòng
+            const modalHeader = document.getElementById('modalRoomImage');
+            
+            let imageUrl;
+            if (room.id === 1) imageUrl = 'images/phong-don/OIP.jfif';
+            else if (room.id === 2) imageUrl = 'images/phong-don/OIP (1).jfif';
+            else if (room.id === 3) imageUrl = 'images/phong-don/OIP (2).jfif';
+            else if (room.id === 4) imageUrl = 'images/phong-don/OIP (3).jfif';
+            else if (room.id === 5) imageUrl = 'images/phong-don/OIP (4).jfif';
+            else if (room.id === 6) imageUrl = 'images/phong-doi/OIP.jfif';
+            else if (room.id === 7) imageUrl = 'images/phong-doi/OIP (1).jfif';
+            else if (room.id === 8) imageUrl = 'images/phong-doi/OIP (2).jfif';
+            else imageUrl = 'images/phong-vip/OIP.jfif';
+            
+            modalHeader.style.backgroundImage = `url('${imageUrl}')`;
+            modalHeader.style.backgroundSize = 'cover';
+            modalHeader.style.backgroundPosition = 'center';
+            
+            // Show modal
+            document.getElementById('roomModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('roomModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            selectedRoom = null;
+        }
+
+        function bookSelectedRoom() {
+            if (!selectedRoom) {
+                alert('Vui lòng chọn phòng');
+                return;
+            }
+            
+            localStorage.setItem('selectedRoom', JSON.stringify(selectedRoom));
+            window.location.href = 'customer-booking.html';
+        }
+
+        function toggleFavorite() {
+            console.log('Toggle favorite for room:', selectedRoom?.name);
+            // Implement favorite functionality
+        }
+
+        function searchRooms() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (!Array.isArray(allRooms)) {
+                console.error('allRooms is not an array:', allRooms);
+                return;
+            }
+            const filteredRooms = allRooms.filter(room => 
+                room.name && room.name.toLowerCase().includes(searchTerm) ||
+                room.type && room.type.toLowerCase().includes(searchTerm)
+            );
+            displayRooms(filteredRooms);
+        }
+
+        function filterByCity(city) {
+            console.log('Filter by city:', city);
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function viewProfile() {
+            window.location.href = 'profile.html';
+        }
+
+        function formatPrice(price) {
+            return parseInt(price).toLocaleString('vi-VN') + ' VND';
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchRooms();
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('roomModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

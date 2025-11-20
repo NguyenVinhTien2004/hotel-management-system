@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập Admin - Khách sạn Cocotier</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="icon" href="data:,">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+            text-decoration: none;
+            list-style: none;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(90deg, #e2e2e2, #c9d6ff);
+        }
+
+        .container {
+            position: relative;
+            width: 850px;
+            height: 550px;
+            background: #fff;
+            margin: 20px;
+            border-radius: 30px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, .2);
+            overflow: hidden;
+        }
+
+        .container h1 {
+            font-size: 36px;
+            margin: -10px 0;
+        }
+
+        .container p {
+            font-size: 14.5px;
+            margin: 15px 0;
+        }
+
+        form { width: 100%; }
+
+        .form-box {
+            position: absolute;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            color: #333;
+            text-align: center;
+            padding: 40px;
+            z-index: 1;
+        }
+
+        .input-box {
+            position: relative;
+            margin: 30px 0;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 13px 50px 13px 20px;
+            background: #eee;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .input-box input::placeholder {
+            color: #888;
+            font-weight: 400;
+        }
+
+        .input-box i {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+        }
+
+        .btn {
+            width: 100%;
+            height: 48px;
+            background: #52c41a;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .toggle-box {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .toggle-box::before {
+            content: '';
+            position: absolute;
+            left: -250%;
+            width: 300%;
+            height: 100%;
+            background: #52c41a;
+            border-radius: 150px;
+            z-index: 2;
+        }
+
+        .toggle-panel {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            left: 0;
+        }
+
+        .toggle-panel p {
+            margin-bottom: 20px;
+        }
+
+        .toggle-panel .btn {
+            width: 160px;
+            height: 46px;
+            background: transparent;
+            border: 2px solid #fff;
+            box-shadow: none;
+        }
+
+        @media screen and (max-width: 650px) {
+            .container { height: calc(100vh - 40px); }
+            .form-box {
+                bottom: 0;
+                width: 100%;
+                height: 70%;
+            }
+            .toggle-box::before {
+                left: 0;
+                top: -270%;
+                width: 100%;
+                height: 300%;
+                border-radius: 20vw;
+            }
+            .toggle-panel {
+                width: 100%;
+                height: 30%;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Admin Login Form -->
+        <div class="form-box">
+            <form id="adminLoginForm">
+                <h1>🔐 Admin/Nhân viên</h1>
+                <div class="input-box">
+                    <input type="text" id="adminUsername" placeholder="Tên đăng nhập" required>
+                    <i class='bx bxs-user'></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" id="adminPassword" placeholder="Mật khẩu" required>
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
+                <button type="submit" class="btn">Đăng nhập</button>
+                <p>Hệ thống quản lý</p>
+            </form>
+        </div>
+
+        <div class="toggle-box">
+            <div class="toggle-panel">
+                <h1>Xin chào!</h1>
+                <p>Chào mừng bạn!</p>
+                <p>Quay lại đăng nhập khách hàng?</p>
+                <button class="btn" onclick="window.location.href='index.html?v=' + Date.now()">← Khách hàng</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        const API_URL = AppConfig.getApiUrl();
+
+        // Admin login
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/admin-login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = 'admin-dashboard.html';
+                } else {
+                    alert(data.message || 'Đăng nhập thất bại');
+                }
+            } catch (error) {
+                alert('Lỗi kết nối server');
+            }
+        });
+    </script>
+</body>
+</html>

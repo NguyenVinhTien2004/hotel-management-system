@@ -1,0 +1,335 @@
+/* ===== ANIMATION STYLES FOR KHÁCH SẠN CÂY DỪA ===== */
+
+/* Keyframes Definitions */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInUp {
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInDown {
+    from { opacity: 0; transform: translateY(-50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes bounce {
+    0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
+    40%, 43% { transform: translate3d(0, -10px, 0); }
+    70% { transform: translate3d(0, -5px, 0); }
+    90% { transform: translate3d(0, -2px, 0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 5px rgba(82, 196, 26, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(82, 196, 26, 0.8), 0 0 30px rgba(82, 196, 26, 0.6); }
+}
+
+/* Base Animation Classes */
+.animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+.animate-slide-in-left { animation: slideInLeft 0.6s ease-out forwards; }
+.animate-slide-in-right { animation: slideInRight 0.6s ease-out forwards; }
+.animate-slide-in-up { animation: slideInUp 0.6s ease-out forwards; }
+.animate-slide-in-down { animation: slideInDown 0.6s ease-out forwards; }
+.animate-scale-in { animation: scaleIn 0.5s ease-out forwards; }
+.animate-bounce { animation: bounce 1s ease-in-out; }
+.animate-pulse { animation: pulse 2s ease-in-out infinite; }
+.animate-shake { animation: shake 0.5s ease-in-out; }
+.animate-spin { animation: spin 1s linear infinite; }
+.animate-glow { animation: glow 2s ease-in-out infinite; }
+
+/* Delay Classes */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+
+/* Smooth Transitions */
+.smooth-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.smooth-transition-fast {
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.smooth-transition-slow {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Button Hover Effects */
+.btn-hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.btn-hover-scale {
+    transition: transform 0.2s ease-in-out;
+}
+
+.btn-hover-scale:hover {
+    transform: scale(1.05);
+}
+
+.btn-hover-glow {
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-hover-glow:hover {
+    box-shadow: 0 0 20px rgba(82, 196, 26, 0.6);
+    transform: translateY(-1px);
+}
+
+/* Card Hover Effects */
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.card-hover-scale {
+    transition: transform 0.3s ease-in-out;
+}
+
+.card-hover-scale:hover {
+    transform: scale(1.02);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #52c41a;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+.loading-dots {
+    display: inline-block;
+}
+
+.loading-dots::after {
+    content: '';
+    animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: ''; }
+    40% { content: '.'; }
+    60% { content: '..'; }
+    80%, 100% { content: '...'; }
+}
+
+/* Modal Animations */
+.modal-backdrop {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.modal-backdrop.show {
+    opacity: 1;
+}
+
+.modal-content {
+    transform: scale(0.8) translateY(-50px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-content.show {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+/* Navigation Animation */
+.nav-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-item::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: #52c41a;
+    transition: left 0.3s ease-in-out;
+}
+
+.nav-item:hover::before {
+    left: 0;
+}
+
+/* Form Input Animations */
+.input-focus {
+    transition: all 0.3s ease-in-out;
+}
+
+.input-focus:focus {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 3px rgba(82, 196, 26, 0.1);
+}
+
+/* Notification Animations */
+.notification {
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+/* Page Transition */
+.page-transition {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Stagger Animation for Lists */
+.stagger-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0.1s; }
+.stagger-item:nth-child(2) { animation-delay: 0.2s; }
+.stagger-item:nth-child(3) { animation-delay: 0.3s; }
+.stagger-item:nth-child(4) { animation-delay: 0.4s; }
+.stagger-item:nth-child(5) { animation-delay: 0.5s; }
+.stagger-item:nth-child(6) { animation-delay: 0.6s; }
+
+/* Floating Animation */
+.float {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Gradient Animation */
+.gradient-animate {
+    background: linear-gradient(-45deg, #52c41a, #73d13d, #95de64, #b7eb8f);
+    background-size: 400% 400%;
+    animation: gradientShift 4s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Text Animations */
+.text-glow {
+    text-shadow: 0 0 10px rgba(82, 196, 26, 0.5);
+    animation: textGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes textGlow {
+    from { text-shadow: 0 0 10px rgba(82, 196, 26, 0.5); }
+    to { text-shadow: 0 0 20px rgba(82, 196, 26, 0.8), 0 0 30px rgba(82, 196, 26, 0.6); }
+}
+
+/* Success/Error Animations */
+.success-bounce {
+    animation: successBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes successBounce {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.error-shake {
+    animation: errorShake 0.5s ease-in-out;
+}
+
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .animate-fade-in,
+    .animate-slide-in-left,
+    .animate-slide-in-right,
+    .animate-slide-in-up,
+    .animate-slide-in-down,
+    .animate-scale-in {
+        animation-duration: 0.4s;
+    }
+    
+    .card-hover:hover {
+        transform: translateY(-2px);
+    }
+    
+    .btn-hover-lift:hover {
+        transform: translateY(-1px);
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

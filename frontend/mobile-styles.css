@@ -1,0 +1,48 @@
+/* Mobile-first responsive styles */
+@media (max-width: 768px) {
+  .bg-white.rounded-3xl {
+    border-radius: 0 !important;
+    height: 100vh !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+  
+  .flex.h-full {
+    flex-direction: column !important;
+  }
+  
+  .flex-1:first-child {
+    min-height: 40vh !important;
+  }
+  
+  .flex-1:last-child {
+    min-height: 60vh !important;
+    padding: 2rem 1rem !important;
+  }
+  
+  .text-5xl {
+    font-size: 2.5rem !important;
+  }
+  
+  .text-3xl {
+    font-size: 1.8rem !important;
+  }
+  
+  .max-w-sm {
+    max-width: 100% !important;
+  }
+}
+
+/* PWA specific styles */
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Touch-friendly buttons */
+button, .btn {
+  min-height: 44px;
+  min-width: 44px;
+}

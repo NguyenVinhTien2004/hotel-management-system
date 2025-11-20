@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API</title>
+</head>
+<body>
+    <h1>Test API Connection</h1>
+    <button onclick="testRooms()">Test Rooms API</button>
+    <button onclick="testServices()">Test Services API</button>
+    <div id="results"></div>
+
+    <script src="frontend/js/config.js"></script>
+    <script>
+        async function testRooms() {
+            try {
+                const API_URL = AppConfig.getApiUrl();
+                console.log('Testing API URL:', API_URL);
+                
+                const response = await fetch(`${API_URL}/rooms`);
+                const data = await response.json();
+                
+                document.getElementById('results').innerHTML = `
+                    <h2>Rooms API Test</h2>
+                    <p>Status: ${response.ok ? 'SUCCESS' : 'FAILED'}</p>
+                    <p>Found ${data.rooms ? data.rooms.length : 0} rooms</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <h2>Rooms API Test</h2>
+                    <p>Status: ERROR</p>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function testServices() {
+            try {
+                const API_URL = AppConfig.getApiUrl();
+                console.log('Testing API URL:', API_URL);
+                
+                const response = await fetch(`${API_URL}/services`);
+                const data = await response.json();
+                
+                document.getElementById('results').innerHTML = `
+                    <h2>Services API Test</h2>
+                    <p>Status: ${response.ok ? 'SUCCESS' : 'FAILED'}</p>
+                    <p>Found ${data.services ? data.services.length : 0} services</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <h2>Services API Test</h2>
+                    <p>Status: ERROR</p>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

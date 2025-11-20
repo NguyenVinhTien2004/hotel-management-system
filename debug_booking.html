@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Booking Calculation</title>
+    <link rel="stylesheet" href="frontend/tailwind-local.css">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold mb-6">Debug Tính Tiền Đặt Phòng</h1>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium mb-2">Chọn phòng:</label>
+                <select id="roomSelect" class="w-full border rounded px-3 py-2">
+                    <option value="">Chọn phòng</option>
+                    <option value="1" data-price="500000">101 - Phòng Hoa Sen (Đơn) - 500.000 VND</option>
+                    <option value="2" data-price="800000">201 - Phòng Biển Xanh (Đôi) - 800.000 VND</option>
+                    <option value="3" data-price="1200000">301 - Phòng Gia Đình Hạnh Phúc (Gia Đình) - 1.200.000 VND</option>
+                    <option value="4" data-price="2000000">401 - Phòng VIP Hoàng Gia (VIP) - 2.000.000 VND</option>
+                </select>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Ngày nhận:</label>
+                    <input type="date" id="checkIn" class="w-full border rounded px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Ngày trả:</label>
+                    <input type="date" id="checkOut" class="w-full border rounded px-3 py-2">
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded">
+                <h3 class="font-semibold mb-2">Kết quả tính toán:</h3>
+                <div class="space-y-1 text-sm">
+                    <div>Giá phòng/đêm: <span id="pricePerNight" class="font-medium">0 VND</span></div>
+                    <div>Số đêm: <span id="nights" class="font-medium">0</span></div>
+                    <div>Tổng tiền phòng: <span id="roomTotal" class="font-medium">0 VND</span></div>
+                    <div class="border-t pt-1 mt-2">
+                        <strong>Tổng cộng: <span id="grandTotal" class="text-green-600">0 VND</span></strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-blue-50 p-4 rounded">
+                <h3 class="font-semibold mb-2">Debug Info:</h3>
+                <div id="debugInfo" class="text-xs text-gray-600 whitespace-pre-wrap"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateTotal() {
+            const roomSelect = document.getElementById('roomSelect');
+            const checkIn = document.getElementById('checkIn').value;
+            const checkOut = document.getElementById('checkOut').value;
+            
+            let debugInfo = 'Debug Log:\n';
+            debugInfo += `Room selected: ${roomSelect.value}\n`;
+            debugInfo += `Check-in: ${checkIn}\n`;
+            debugInfo += `Check-out: ${checkOut}\n`;
+            
+            if (roomSelect.value && checkIn && checkOut) {
+                const selectedOption = roomSelect.options[roomSelect.selectedIndex];
+                debugInfo += `Selected option text: "${selectedOption.text}"\n`;
+                debugInfo += `Data-price attribute: ${selectedOption.dataset.price}\n`;
+                
+                // Thử parse giá từ data attribute
+                const roomPrice = parseFloat(selectedOption.dataset.price);
+                debugInfo += `Parsed room price: ${roomPrice}\n`;
+                
+                const checkInDate = new Date(checkIn);
+                const checkOutDate = new Date(checkOut);
+                const nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
+                
+                debugInfo += `Check-in date: ${checkInDate}\n`;
+                debugInfo += `Check-out date: ${checkOutDate}\n`;
+                debugInfo += `Calculated nights: ${nights}\n`;
+                
+                if (nights > 0 && roomPrice > 0) {
+                    const roomTotal = roomPrice * nights;
+                    debugInfo += `Room total: ${roomPrice} × ${nights} = ${roomTotal}\n`;
+                    
+                    document.getElementById('pricePerNight').textContent = roomPrice.toLocaleString('vi-VN') + ' VND';
+                    document.getElementById('nights').textContent = nights;
+                    document.getElementById('roomTotal').textContent = roomTotal.toLocaleString('vi-VN') + ' VND';
+                    document.getElementById('grandTotal').textContent = roomTotal.toLocaleString('vi-VN') + ' VND';
+                } else {
+                    debugInfo += 'ERROR: Invalid nights or room price\n';
+                    resetDisplay();
+                }
+            } else {
+                debugInfo += 'Missing required fields\n';
+                resetDisplay();
+            }
+            
+            document.getElementById('debugInfo').textContent = debugInfo;
+        }
+        
+        function resetDisplay() {
+            document.getElementById('pricePerNight').textContent = '0 VND';
+            document.getElementById('nights').textContent = '0';
+            document.getElementById('roomTotal').textContent = '0 VND';
+            document.getElementById('grandTotal').textContent = '0 VND';
+        }
+        
+        // Set default dates
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        document.getElementById('checkIn').value = today.toISOString().split('T')[0];
+        document.getElementById('checkOut').value = tomorrow.toISOString().split('T')[0];
+        
+        // Add event listeners
+        document.getElementById('roomSelect').addEventListener('change', calculateTotal);
+        document.getElementById('checkIn').addEventListener('change', calculateTotal);
+        document.getElementById('checkOut').addEventListener('change', calculateTotal);
+        
+        // Initial calculation
+        calculateTotal();
+    </script>
+</body>
+</html>

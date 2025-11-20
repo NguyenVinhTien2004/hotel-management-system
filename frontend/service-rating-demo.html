@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Đánh giá dịch vụ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-4xl mx-auto py-6 px-4">
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Demo - Đánh giá dịch vụ</h2>
+            <p class="text-gray-600 mb-4">Trang này để test tính năng đánh giá dịch vụ mới</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <h3 class="font-semibold">Test Case 1: Khách có đặt dịch vụ</h3>
+                    <a href="service-rating.html?booking_id=999" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        Đánh giá với dịch vụ (Booking #999)
+                    </a>
+                    <p class="text-sm text-gray-500 mt-1">Sẽ hiển thị form đánh giá dịch vụ: Giặt ủi, Massage</p>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold">Test Case 2: Khách không đặt dịch vụ</h3>
+                    <a href="service-rating.html?booking_id=1" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                        Đánh giá không có dịch vụ (Booking #1)
+                    </a>
+                    <p class="text-sm text-gray-500 mt-1">Chỉ hiển thị đánh giá phòng và nhân viên</p>
+                </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded">
+                <h4 class="font-semibold text-yellow-800">Hướng dẫn test:</h4>
+                <ol class="list-decimal list-inside text-sm text-yellow-700 mt-2 space-y-1">
+                    <li>Chạy: <code>mysql -u root -p quanlykhachsan < demo_service_rating.sql</code></li>
+                    <li>Khởi động server: <code>node server.js</code></li>
+                    <li>Click vào các link test ở trên</li>
+                    <li>Kiểm tra xem form đánh giá dịch vụ có hiển thị đúng không</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

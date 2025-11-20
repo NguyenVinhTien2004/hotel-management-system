@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery phòng - Khách sạn Cocotier</title>
+    <link rel="icon" href="images/icon-192.png">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 350px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            height: calc(100vh - 40px);
+            overflow: hidden;
+        }
+
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .gallery-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            width: 35px;
+            height: 35px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #e0e0e0;
+            transform: scale(1.1);
+        }
+
+        .room-gallery {
+            height: calc(100% - 80px);
+            overflow-y: auto;
+        }
+
+        .room-card {
+            margin-bottom: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .room-image {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(45deg, #ddd, #eee);
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .room-rating {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .room-info {
+            padding: 15px;
+        }
+
+        .room-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .room-desc {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .room-features {
+            display: flex;
+            gap: 8px;
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .room-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #4285f4;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+
+        /* Custom scrollbar */
+        .room-gallery::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .room-gallery::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .room-gallery::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+
+        .room-gallery::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <div class="back-btn" onclick="goBack()">
+        <i class='bx bx-arrow-back'></i>
+    </div>
+
+    <div class="container">
+        <div class="gallery-header">
+            <div class="section-title">Phòng nổi bật</div>
+            <div class="gallery-nav">
+                <div class="nav-btn" onclick="scrollGallery('up')">
+                    <i class='bx bx-chevron-up'></i>
+                </div>
+                <div class="nav-btn" onclick="scrollGallery('down')">
+                    <i class='bx bx-chevron-down'></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="room-gallery" id="roomGallery">
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <i class='bx bx-loader-alt bx-spin' style="font-size: 24px;"></i>
+                <p style="margin-top: 10px;">Đang tải...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        const API_URL = AppConfig.getApiUrl();
+        let allRooms = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadRooms();
+        });
+
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+        }
+
+        async function loadRooms() {
+            try {
+                const response = await fetch(`${API_URL}/rooms`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    allRooms = Array.isArray(data) ? data : (data.rooms || []);
+                    displayRoomGallery(allRooms);
+                } else {
+                    console.error('Failed to load rooms');
+                    allRooms = [];
+                }
+            } catch (error) {
+                console.error('Error loading rooms:', error);
+                allRooms = [];
+                document.getElementById('roomGallery').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        <i class='bx bx-error' style="font-size: 24px;"></i>
+                        <p style="margin-top: 10px;">Lỗi tải dữ liệu</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayRoomGallery(rooms) {
+            const roomGallery = document.getElementById('roomGallery');
+            
+            if (rooms.length === 0) {
+                roomGallery.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        <i class='bx bx-home' style="font-size: 24px;"></i>
+                        <p style="margin-top: 10px;">Không có phòng nào</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            roomGallery.innerHTML = rooms.map(room => `
+                <div class="room-card" onclick="selectRoom(${room.id})">
+                    <div class="room-image" style="background-image: url('${room.image || 'images/placeholder.jpg'}');">
+                        <div class="room-rating">
+                            <i class='bx bxs-star' style="color: #ffc107;"></i>
+                            4.${Math.floor(Math.random() * 9) + 1}
+                        </div>
+                    </div>
+                    <div class="room-info">
+                        <div class="room-name">${room.name}</div>
+                        <div class="room-desc">${room.description || 'Phòng thoải mái với đầy đủ tiện nghi hiện đại'}</div>
+                        <div class="room-features">
+                            <span>2 Người</span>
+                            <span>•</span>
+                            <span>${room.type}</span>
+                            <span>•</span>
+                            <span>Có sẵn</span>
+                        </div>
+                        <div class="room-price">${formatPrice(room.price)}/đêm</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectRoom(roomId) {
+            const room = allRooms.find(r => r.id === roomId);
+            if (room) {
+                localStorage.setItem('selectedRoom', JSON.stringify(room));
+                window.location.href = 'customer-room-detail.html';
+            }
+        }
+
+        function scrollGallery(direction) {
+            const gallery = document.getElementById('roomGallery');
+            const scrollAmount = 200;
+            
+            if (direction === 'up') {
+                gallery.scrollTop -= scrollAmount;
+            } else {
+                gallery.scrollTop += scrollAmount;
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(price);
+        }
+    </script>
+</body>
+</html>

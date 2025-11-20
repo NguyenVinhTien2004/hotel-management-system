@@ -1,0 +1,113 @@
+/* Cocotier Hotel Logo Component */
+.cocotier-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.palm-tree-mini {
+    width: 24px;
+    height: 30px;
+    position: relative;
+    margin-right: 8px;
+}
+
+.trunk-mini {
+    width: 4px;
+    height: 18px;
+    background: linear-gradient(180deg, #8B6F47 0%, #6B4423 100%);
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+.leaf-mini {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform-origin: bottom center;
+}
+
+.leaf-left-mini {
+    width: 14px;
+    height: 10px;
+    background: #2d5016;
+    border-radius: 50% 0 0 50%;
+    transform: translateX(-50%) rotate(-25deg);
+    left: 30%;
+}
+
+.leaf-right-mini {
+    width: 14px;
+    height: 10px;
+    background: #2d5016;
+    border-radius: 0 50% 50% 0;
+    transform: translateX(-50%) rotate(25deg);
+    left: 70%;
+}
+
+.logo-text {
+    font-weight: 700;
+    color: #5B6FB0;
+    font-size: 16px;
+    letter-spacing: 1px;
+}
+
+/* Larger version for headers */
+.cocotier-logo-large {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.palm-tree-large {
+    width: 32px;
+    height: 40px;
+    position: relative;
+    margin-right: 12px;
+}
+
+.trunk-large {
+    width: 6px;
+    height: 24px;
+    background: linear-gradient(180deg, #8B6F47 0%, #6B4423 100%);
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 3px;
+}
+
+.leaf-large {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform-origin: bottom center;
+}
+
+.leaf-left-large {
+    width: 18px;
+    height: 14px;
+    background: #2d5016;
+    border-radius: 50% 0 0 50%;
+    transform: translateX(-50%) rotate(-25deg);
+    left: 30%;
+}
+
+.leaf-right-large {
+    width: 18px;
+    height: 14px;
+    background: #2d5016;
+    border-radius: 0 50% 50% 0;
+    transform: translateX(-50%) rotate(25deg);
+    left: 70%;
+}
+
+.logo-text-large {
+    font-weight: 700;
+    color: #5B6FB0;
+    font-size: 20px;
+    letter-spacing: 2px;
+}

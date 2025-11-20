@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giao diện Khách hàng - Hotel Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 350px 400px 1fr;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Left Panel - Main Menu */
+        .left-panel {
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .menu-icon {
+            width: 30px;
+            height: 30px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .location {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .greeting {
+            margin-bottom: 20px;
+        }
+
+        .greeting h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .greeting p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: none;
+            background: #f8f9fa;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #4285f4;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .city-list {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .city-item {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .city-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 8px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .city-name {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .hotel-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .hotel-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .hotel-item:hover {
+            background: #f8f9fa;
+            margin: 0 -15px;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .hotel-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            background: linear-gradient(45deg, #ddd, #eee);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hotel-info h4 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .hotel-info p {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .hotel-price {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4285f4;
+        }
+
+        /* Center Panel - Hotel Detail */
+        .center-panel {
+            position: relative;
+        }
+
+        .hotel-detail-image {
+            width: 100%;
+            height: 250px;
+            border-radius: 15px;
+            background: linear-gradient(45deg, #ddd, #eee);
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn, .heart-btn {
+            width: 35px;
+            height: 35px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .hotel-title {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+        }
+
+        .hotel-title h3 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .hotel-title .price {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .rating-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .distance {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .star {
+            color: #ffc107;
+            font-size: 16px;
+        }
+
+        .amenities {
+            margin-bottom: 25px;
+        }
+
+        .amenities-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .amenity-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .amenity-icon {
+            width: 30px;
+            height: 30px;
+            margin: 0 auto 8px;
+            background: #4285f4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .amenity-name {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .description {
+            margin-bottom: 25px;
+        }
+
+        .description p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .book-btn {
+            width: 100%;
+            padding: 15px;
+            background: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .book-btn:hover {
+            background: #3367d6;
+            transform: translateY(-2px);
+        }
+
+        /* Right Panel - Room Gallery */
+        .right-panel {
+            position: relative;
+        }
+
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .gallery-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .room-gallery {
+            height: calc(100% - 60px);
+            overflow-y: auto;
+        }
+
+        .room-card {
+            margin-bottom: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .room-image {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(45deg, #ddd, #eee);
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .room-rating {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .room-info {
+            padding: 15px;
+        }
+
+        .room-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .room-desc {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .room-features {
+            display: flex;
+            gap: 10px;
+            font-size: 11px;
+            color: #888;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel - Main Menu -->
+        <div class="card left-panel">
+            <div class="header">
+                <div class="menu-icon">☰</div>
+                <div class="location">
+                    <span>📍</span>
+                    <span>Hà Nội, Việt Nam</span>
+                </div>
+                <div class="profile-pic">KH</div>
+            </div>
+
+            <div class="greeting">
+                <h2>Xin chào Khách hàng,</h2>
+                <p>Khám phá những khách sạn tuyệt vời</p>
+            </div>
+
+            <div class="search-box">
+                <input type="text" placeholder="Tìm kiếm khách sạn...">
+                <div class="search-icon">🔍</div>
+            </div>
+
+            <div class="section-title">Khám phá thành phố</div>
+            <div class="city-list">
+                <div class="city-item">
+                    <div class="city-icon" style="background: linear-gradient(45deg, #ff6b6b, #ee5a24);"></div>
+                    <div class="city-name">Hà Nội</div>
+                </div>
+                <div class="city-item">
+                    <div class="city-icon" style="background: linear-gradient(45deg, #4834d4, #686de0);"></div>
+                    <div class="city-name">TP.HCM</div>
+                </div>
+                <div class="city-item">
+                    <div class="city-icon" style="background: linear-gradient(45deg, #00d2d3, #54a0ff);"></div>
+                    <div class="city-name">Đà Nẵng</div>
+                </div>
+            </div>
+
+            <div class="section-title">Khách sạn khác</div>
+            <div class="hotel-list">
+                <div class="hotel-item">
+                    <div class="hotel-image" style="background: linear-gradient(45deg, #ffecd2, #fcb69f);"></div>
+                    <div class="hotel-info">
+                        <h4>Hotel Cocotier Palace</h4>
+                        <p>⭐ 4.8 • 2.5km từ trung tâm</p>
+                        <div class="hotel-price">₫2,500,000/đêm</div>
+                    </div>
+                </div>
+                
+                <div class="hotel-item">
+                    <div class="hotel-image" style="background: linear-gradient(45deg, #a8edea, #fed6e3);"></div>
+                    <div class="hotel-info">
+                        <h4>The Grand Hotel</h4>
+                        <p>⭐ 4.6 • 1.8km từ trung tâm</p>
+                        <div class="hotel-price">₫1,800,000/đêm</div>
+                    </div>
+                </div>
+
+                <div class="hotel-item">
+                    <div class="hotel-image" style="background: linear-gradient(45deg, #ffd89b, #19547b);"></div>
+                    <div class="hotel-info">
+                        <h4>Luxury Resort</h4>
+                        <p>⭐ 4.9 • 3.2km từ trung tâm</p>
+                        <div class="hotel-price">₫3,200,000/đêm</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Panel - Hotel Detail -->
+        <div class="card center-panel">
+            <div class="hotel-detail-image" style="background: linear-gradient(45deg, #667eea, #764ba2);">
+                <div class="image-overlay">
+                    <div class="nav-btn">←</div>
+                    <div class="heart-btn">♡</div>
+                </div>
+                <div class="hotel-title">
+                    <h3>The Taj Mahal Palace</h3>
+                    <div class="price">₫2,100,000/đêm</div>
+                </div>
+            </div>
+
+            <div class="rating-section">
+                <div class="distance">
+                    <span style="color: #ff6b6b;">📍</span>
+                    <span>743 KM từ trung tâm</span>
+                </div>
+                <div class="rating">
+                    <span class="star">⭐</span>
+                    <span>4.8 Đánh giá</span>
+                </div>
+            </div>
+
+            <div class="amenities">
+                <div class="section-title">Tiện ích khách sạn</div>
+                <div class="amenities-grid">
+                    <div class="amenity-item">
+                        <div class="amenity-icon">📶</div>
+                        <div class="amenity-name">WiFi</div>
+                    </div>
+                    <div class="amenity-item">
+                        <div class="amenity-icon">❄️</div>
+                        <div class="amenity-name">Điều hòa</div>
+                    </div>
+                    <div class="amenity-item">
+                        <div class="amenity-icon">🅿️</div>
+                        <div class="amenity-name">Bãi đỗ xe</div>
+                    </div>
+                    <div class="amenity-item">
+                        <div class="amenity-icon">🏊</div>
+                        <div class="amenity-name">Hồ bơi</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="description">
+                <div class="section-title">Mô tả</div>
+                <p>Khách sạn sang trọng với thiết kế hiện đại, nằm ở vị trí đắc địa trong thành phố. Cung cấp dịch vụ 5 sao với đầy đủ tiện nghi cao cấp, phù hợp cho cả du lịch và công tác.</p>
+            </div>
+
+            <button class="book-btn">Đặt phòng ngay</button>
+        </div>
+
+        <!-- Right Panel - Room Gallery -->
+        <div class="card right-panel">
+            <div class="gallery-header">
+                <div class="section-title">Phòng có sẵn</div>
+                <div class="gallery-nav">
+                    <div class="nav-btn">←</div>
+                    <div class="nav-btn">→</div>
+                </div>
+            </div>
+
+            <div class="room-gallery">
+                <div class="room-card">
+                    <div class="room-image" style="background: linear-gradient(45deg, #ffecd2, #fcb69f);">
+                        <div class="room-rating">⭐ 4.8</div>
+                    </div>
+                    <div class="room-info">
+                        <div class="room-name">Deluxe Ocean View</div>
+                        <div class="room-desc">Phòng cao cấp với view biển tuyệt đẹp, diện tích 45m²</div>
+                        <div class="room-features">
+                            <span>2 Người</span>
+                            <span>•</span>
+                            <span>45m²</span>
+                            <span>•</span>
+                            <span>View biển</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="room-card">
+                    <div class="room-image" style="background: linear-gradient(45deg, #a8edea, #fed6e3);">
+                        <div class="room-rating">⭐ 4.6</div>
+                    </div>
+                    <div class="room-info">
+                        <div class="room-name">Superior City View</div>
+                        <div class="room-desc">Phòng tiêu chuẩn với view thành phố, diện tích 35m²</div>
+                        <div class="room-features">
+                            <span>2 Người</span>
+                            <span>•</span>
+                            <span>35m²</span>
+                            <span>•</span>
+                            <span>View thành phố</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="room-card">
+                    <div class="room-image" style="background: linear-gradient(45deg, #ffd89b, #19547b);">
+                        <div class="room-rating">⭐ 4.9</div>
+                    </div>
+                    <div class="room-info">
+                        <div class="room-name">Presidential Suite</div>
+                        <div class="room-desc">Suite tổng thống với không gian rộng rãi, diện tích 80m²</div>
+                        <div class="room-features">
+                            <span>4 Người</span>
+                            <span>•</span>
+                            <span>80m²</span>
+                            <span>•</span>
+                            <span>Suite</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Thêm hiệu ứng tương tác
+        document.querySelectorAll('.hotel-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Cập nhật panel giữa với thông tin khách sạn được chọn
+                console.log('Chọn khách sạn:', this.querySelector('h4').textContent);
+            });
+        });
+
+        document.querySelectorAll('.room-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Hiển thị chi tiết phòng
+                console.log('Chọn phòng:', this.querySelector('.room-name').textContent);
+            });
+        });
+
+        document.querySelector('.book-btn').addEventListener('click', function() {
+            alert('Chuyển đến trang đặt phòng...');
+        });
+
+        // Hiệu ứng search
+        document.querySelector('.search-box input').addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.02)';
+        });
+
+        document.querySelector('.search-box input').addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    </script>
+</body>
+</html>

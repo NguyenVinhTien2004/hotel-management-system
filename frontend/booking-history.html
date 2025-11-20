@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử đặt phòng - Khách sạn Cocotier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="modal-scroll-fix.css">
+    <link rel="stylesheet" href="cocotier-logo.css">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <button onclick="window.history.back()" class="mr-3 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <a href="dashboard.html" class="mr-3">
+                        <div class="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-green-600 text-lg font-bold">🌴</div>
+                    </a>
+                    <h1 class="text-xl font-semibold">Lịch sử đặt phòng</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="userName" class="text-gray-700"></span>
+                    <button onclick="logout()" class="text-red-600 hover:text-red-700">Đăng xuất</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 py-6 sm:px-0">
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Lịch sử đặt phòng của tôi</h3>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã đặt phòng</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phòng</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày nhận</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày trả</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tổng tiền</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookingHistoryBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Booking history will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Đánh giá dịch vụ</h3>
+                </div>
+                <form id="feedbackForm" class="px-6 py-4 space-y-4">
+                    <input type="hidden" id="feedbackBookingId">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Đánh giá phòng (1-5 sao)</label>
+                        <select id="roomRating" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="">Chọn đánh giá</option>
+                            <option value="1">1 sao - Rất tệ</option>
+                            <option value="2">2 sao - Tệ</option>
+                            <option value="3">3 sao - Bình thường</option>
+                            <option value="4">4 sao - Tốt</option>
+                            <option value="5">5 sao - Rất tốt</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Đánh giá dịch vụ (1-5 sao)</label>
+                        <select id="serviceRating" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="">Chọn đánh giá</option>
+                            <option value="1">1 sao - Rất tệ</option>
+                            <option value="2">2 sao - Tệ</option>
+                            <option value="3">3 sao - Bình thường</option>
+                            <option value="4">4 sao - Tốt</option>
+                            <option value="5">5 sao - Rất tốt</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nhận xét</label>
+                        <textarea id="comment" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Chia sẻ trải nghiệm của bạn..."></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="hideFeedbackModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Hủy</button>
+                        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Gửi đánh giá</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001/api';
+        
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            document.getElementById('userName').textContent = user.name || 'Khách hàng';
+        }
+        
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+        
+        async function loadBookingHistory() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/bookings`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayBookingHistory(data.bookings || []);
+                }
+            } catch (error) {
+                console.error('Error loading booking history:', error);
+            }
+        }
+        
+        async function displayBookingHistory(bookings) {
+            const tbody = document.getElementById('bookingHistoryBody');
+            const rows = [];
+            
+            for (const booking of bookings) {
+                const actions = await getHistoryActions(booking);
+                rows.push(`
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#${booking.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${booking.room_number}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(booking.check_in)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(booking.check_out)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${booking.total_amount.toLocaleString('vi-VN')} VND</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getBookingStatusColor(booking.status)}">
+                                ${getBookingStatusText(booking.status)}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            ${actions}
+                        </td>
+                    </tr>
+                `);
+            }
+            
+            tbody.innerHTML = rows.join('');
+        }
+        
+        async function getHistoryActions(booking) {
+            if (booking.status === 'checked_out') {
+                // Kiểm tra xem đã đánh giá chưa
+                const hasRated = await checkIfRated(booking.id);
+                if (hasRated) {
+                    return `<span class="text-green-600">✓ Đã đánh giá</span>`;
+                } else {
+                    return `
+                        <button onclick="showFeedbackModal(${booking.id})" class="text-blue-600 hover:text-blue-900 mr-2">Đánh giá nhanh</button>
+                        <a href="service-rating.html?booking_id=${booking.id}" class="text-green-600 hover:text-green-900">Đánh giá chi tiết</a>
+                    `;
+                }
+            } else if (booking.status === 'pending') {
+                return `<button onclick="cancelBooking(${booking.id})" class="text-red-600 hover:text-red-900">Hủy đặt phòng</button>`;
+            }
+            return '<span class="text-gray-400">-</span>';
+        }
+        
+        async function checkIfRated(bookingId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/feedback?booking_id=${bookingId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.feedback && data.feedback.length > 0;
+                }
+            } catch (error) {
+                console.error('Error checking rating:', error);
+            }
+            return false;
+        }
+        
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('vi-VN');
+        }
+        
+        function getBookingStatusColor(status) {
+            switch(status) {
+                case 'pending': return 'bg-yellow-100 text-yellow-800';
+                case 'confirmed': return 'bg-green-100 text-green-800';
+                case 'checked_in': return 'bg-blue-100 text-blue-800';
+                case 'checked_out': return 'bg-gray-100 text-gray-800';
+                case 'cancelled': return 'bg-red-100 text-red-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+        
+        function getBookingStatusText(status) {
+            switch(status) {
+                case 'pending': return 'Chờ xác nhận';
+                case 'confirmed': return 'Đã xác nhận';
+                case 'checked_in': return 'Đã nhận phòng';
+                case 'checked_out': return 'Đã trả phòng';
+                case 'cancelled': return 'Đã hủy';
+                default: return 'Không xác định';
+            }
+        }
+        
+        function showFeedbackModal(bookingId) {
+            document.getElementById('feedbackBookingId').value = bookingId;
+            document.getElementById('feedbackModal').classList.remove('hidden');
+        }
+        
+        function hideFeedbackModal() {
+            document.getElementById('feedbackModal').classList.add('hidden');
+            document.getElementById('feedbackForm').reset();
+        }
+        
+        async function cancelBooking(bookingId) {
+            if (!confirm('Bạn có chắc chắn muốn hủy đặt phòng này?')) return;
+            
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/bookings/${bookingId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status: 'cancelled' })
+                });
+                
+                if (response.ok) {
+                    loadBookingHistory();
+                    alert('Hủy đặt phòng thành công!');
+                }
+            } catch (error) {
+                alert('Lỗi kết nối server');
+            }
+        }
+        
+        document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const token = localStorage.getItem('token');
+            const feedbackData = {
+                booking_id: document.getElementById('feedbackBookingId').value,
+                room_rating: document.getElementById('roomRating').value,
+                service_rating: document.getElementById('serviceRating').value,
+                comment: document.getElementById('comment').value
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/feedback`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(feedbackData)
+                });
+                
+                if (response.ok) {
+                    hideFeedbackModal();
+                    alert('Cảm ơn bạn đã đánh giá!');
+                    // Set flag to refresh dashboard
+                    localStorage.setItem('refreshDashboard', 'true');
+                    // Reload booking history to update actions
+                    loadBookingHistory();
+                } else {
+                    const error = await response.json();
+                    alert(error.message || 'Có lỗi xảy ra');
+                }
+            } catch (error) {
+                alert('Lỗi kết nối server');
+            }
+        });
+        
+        checkAuth();
+        loadBookingHistory();
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tạo Icon PWA</title>
+</head>
+<body>
+    <canvas id="canvas192" width="192" height="192" style="border:1px solid #000; margin: 10px;"></canvas>
+    <canvas id="canvas512" width="512" height="512" style="border:1px solid #000; margin: 10px;"></canvas>
+    <br>
+    <button onclick="downloadIcons()">Tải xuống Icons</button>
+
+    <script>
+        // Tạo icon 192x192
+        const canvas192 = document.getElementById('canvas192');
+        const ctx192 = canvas192.getContext('2d');
+        
+        // Background gradient
+        const gradient192 = ctx192.createLinearGradient(0, 0, 192, 192);
+        gradient192.addColorStop(0, '#4CAF50');
+        gradient192.addColorStop(1, '#2E7D32');
+        ctx192.fillStyle = gradient192;
+        ctx192.fillRect(0, 0, 192, 192);
+        
+        // Hotel icon
+        ctx192.fillStyle = 'white';
+        ctx192.font = 'bold 80px Arial';
+        ctx192.textAlign = 'center';
+        ctx192.fillText('🏨', 96, 120);
+        
+        // Tạo icon 512x512
+        const canvas512 = document.getElementById('canvas512');
+        const ctx512 = canvas512.getContext('2d');
+        
+        const gradient512 = ctx512.createLinearGradient(0, 0, 512, 512);
+        gradient512.addColorStop(0, '#4CAF50');
+        gradient512.addColorStop(1, '#2E7D32');
+        ctx512.fillStyle = gradient512;
+        ctx512.fillRect(0, 0, 512, 512);
+        
+        ctx512.fillStyle = 'white';
+        ctx512.font = 'bold 200px Arial';
+        ctx512.textAlign = 'center';
+        ctx512.fillText('🏨', 256, 320);
+        
+        function downloadIcons() {
+            // Download 192x192
+            const link192 = document.createElement('a');
+            link192.download = 'icon-192.png';
+            link192.href = canvas192.toDataURL();
+            link192.click();
+            
+            // Download 512x512
+            setTimeout(() => {
+                const link512 = document.createElement('a');
+                link512.download = 'icon-512.png';
+                link512.href = canvas512.toDataURL();
+                link512.click();
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

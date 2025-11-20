@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý hóa đơn - Khách sạn Cây Dừa</title>
+    <link rel="stylesheet" href="tailwind-local.css">
+    <script src="./js/config.js"></script>
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="admin-dashboard.html" class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold mr-3">CD</a>
+                    <h1 class="text-xl font-semibold">Quản lý hóa đơn</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="logout()" class="text-red-600 hover:text-red-700">Đăng xuất</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 py-6 sm:px-0">
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Danh sách hóa đơn</h3>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Khách hàng</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phòng</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tiền phòng</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tiền dịch vụ</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tổng tiền</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoicesTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Invoices will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = AppConfig.getApiUrl();
+        
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+        
+        async function loadInvoices() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/admin/invoices`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayInvoices(data.invoices || []);
+                }
+            } catch (error) {
+                console.error('Error loading invoices:', error);
+            }
+        }
+        
+        function displayInvoices(invoices) {
+            const tbody = document.getElementById('invoicesTableBody');
+            tbody.innerHTML = invoices.map(invoice => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#${invoice.id}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${invoice.customer_name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Booking #${invoice.booking_id}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatPrice(invoice.room_charges)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatPrice(invoice.service_charges)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">${formatPrice(invoice.total_amount)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getInvoiceStatusColor(invoice.status)}">
+                            ${getInvoiceStatusText(invoice.status)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="printInvoice(${invoice.id})" class="text-blue-600 hover:text-blue-900 mr-3">In hóa đơn</button>
+                        <button onclick="deleteInvoice(${invoice.id})" class="text-red-600 hover:text-red-900">Xóa</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function formatPrice(price) {
+            if (typeof price === 'string' && price.includes('VND')) {
+                return price;
+            }
+            return price.toLocaleString('vi-VN').replace(/,/g, '.') + ' VND';
+        }
+        
+        function getInvoiceStatusColor(status) {
+            switch(status) {
+                case 'pending': return 'bg-yellow-100 text-yellow-800';
+                case 'paid': return 'bg-green-100 text-green-800';
+                case 'cancelled': return 'bg-red-100 text-red-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+        
+        function getInvoiceStatusText(status) {
+            switch(status) {
+                case 'pending': return 'Chờ thanh toán';
+                case 'paid': return 'Đã thanh toán';
+                case 'cancelled': return 'Đã hủy';
+                default: return 'Không xác định';
+            }
+        }
+        
+        function printInvoice(invoiceId) {
+            alert(`In hóa đơn #${invoiceId}`);
+        }
+        
+        async function deleteInvoice(invoiceId) {
+            if (!confirm('Bạn có chắc chắn muốn xóa hóa đơn này?')) return;
+            
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/admin/invoices/${invoiceId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    loadInvoices();
+                    alert('Xóa hóa đơn thành công!');
+                }
+            } catch (error) {
+                alert('Lỗi kết nối server');
+            }
+        }
+        
+        loadInvoices();
+    </script>
+</body>
+</html>

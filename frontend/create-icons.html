@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tạo Icon PWA</title>
+</head>
+<body>
+    <h2>Tạo Icon cho PWA</h2>
+    <canvas id="icon192" width="192" height="192"></canvas>
+    <canvas id="icon512" width="512" height="512"></canvas>
+    <br><br>
+    <button onclick="downloadIcon(192)">Tải icon 192x192</button>
+    <button onclick="downloadIcon(512)">Tải icon 512x512</button>
+
+    <script>
+        function createIcon(size) {
+            const canvas = document.getElementById(`icon${size}`);
+            const ctx = canvas.getContext('2d');
+            
+            // Background xanh lá
+            ctx.fillStyle = '#52c41a';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Viền tròn
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/2 - 10, 0, 2 * Math.PI);
+            ctx.fillStyle = '#45b018';
+            ctx.fill();
+            
+            // Text CD
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size/3}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('CD', size/2, size/2);
+            
+            // Cây dừa emoji (nếu hỗ trợ)
+            ctx.font = `${size/4}px Arial`;
+            ctx.fillText('🌴', size/2, size/2 + size/6);
+        }
+        
+        function downloadIcon(size) {
+            const canvas = document.getElementById(`icon${size}`);
+            const link = document.createElement('a');
+            link.download = `icon-${size}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Tạo icons khi load trang
+        createIcon(192);
+        createIcon(512);
+    </script>
+</body>
+</html>

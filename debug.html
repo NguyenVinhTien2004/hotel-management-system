@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Khách sạn Cocotier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Debug Hệ Thống</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- API Tests -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">API Tests</h2>
+                <div class="space-y-2">
+                    <button onclick="testRooms()" class="w-full bg-blue-600 text-white py-2 px-4 rounded">Test Rooms API</button>
+                    <button onclick="testServices()" class="w-full bg-green-600 text-white py-2 px-4 rounded">Test Services API</button>
+                    <button onclick="testBookings()" class="w-full bg-purple-600 text-white py-2 px-4 rounded">Test Bookings API</button>
+                </div>
+            </div>
+
+            <!-- Auth Tests -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Auth Tests</h2>
+                <div class="space-y-2">
+                    <button onclick="testLogin()" class="w-full bg-indigo-600 text-white py-2 px-4 rounded">Test Login</button>
+                    <button onclick="checkToken()" class="w-full bg-yellow-600 text-white py-2 px-4 rounded">Check Token</button>
+                    <button onclick="clearStorage()" class="w-full bg-red-600 text-white py-2 px-4 rounded">Clear Storage</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="mt-8 bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">Results</h2>
+            <div id="results" class="bg-gray-50 p-4 rounded min-h-32 font-mono text-sm overflow-auto max-h-96"></div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="mt-8 bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">Quick Links</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <a href="index.html" class="bg-gray-600 text-white py-2 px-4 rounded text-center">Login</a>
+                <a href="dashboard.html" class="bg-green-600 text-white py-2 px-4 rounded text-center">Dashboard</a>
+                <a href="room-list.html" class="bg-blue-600 text-white py-2 px-4 rounded text-center">Rooms</a>
+                <a href="bookings.html" class="bg-purple-600 text-white py-2 px-4 rounded text-center">Bookings</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="frontend/js/config.js"></script>
+    <script>
+        const API_URL = AppConfig.getApiUrl();
+        
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'text-red-600' : type === 'success' ? 'text-green-600' : 'text-blue-600';
+            results.innerHTML += `<div class="${color}">[${timestamp}] ${message}</div>`;
+            results.scrollTop = results.scrollHeight;
+        }
+
+        async function testRooms() {
+            log('🔄 Testing Rooms API...');
+            try {
+                const response = await fetch(`${API_URL}/rooms`);
+                log(`📡 Response status: ${response.status}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Success! Found ${data.rooms ? data.rooms.length : 0} rooms`, 'success');
+                    log(`📊 Room types: ${JSON.stringify(data.rooms?.reduce((acc, room) => {
+                        acc[room.type] = (acc[room.type] || 0) + 1;
+                        return acc;
+                    }, {}) || {})}`);
+                } else {
+                    const errorText = await response.text();
+                    log(`❌ Failed: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testServices() {
+            log('🔄 Testing Services API...');
+            try {
+                const response = await fetch(`${API_URL}/services`);
+                log(`📡 Response status: ${response.status}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Success! Found ${data.services ? data.services.length : 0} services`, 'success');
+                    if (data.services) {
+                        data.services.forEach(service => {
+                            log(`  - ${service.name}: ${service.price.toLocaleString('vi-VN')} VND`);
+                        });
+                    }
+                } else {
+                    const errorText = await response.text();
+                    log(`❌ Failed: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testBookings() {
+            log('🔄 Testing Bookings API...');
+            const token = localStorage.getItem('token');
+            log(`🔑 Token: ${token ? 'Present' : 'Missing'}`);
+            
+            if (!token) {
+                log('❌ No token found. Please login first.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/bookings`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                log(`📡 Response status: ${response.status}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Success! Found ${data.bookings ? data.bookings.length : 0} bookings`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    log(`❌ Failed: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLogin() {
+            log('🔄 Testing Login with admin/@@@@...');
+            try {
+                const response = await fetch(`${API_URL}/auth/admin-login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'admin', password: '@@@@' })
+                });
+                
+                log(`📡 Response status: ${response.status}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    log(`✅ Login successful! Role: ${data.user.role}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    log(`❌ Login failed: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function checkToken() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            log(`🔑 Token: ${token ? 'Present' : 'Missing'}`);
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    log(`📋 Token payload: ${JSON.stringify(payload, null, 2)}`);
+                } catch (e) {
+                    log(`❌ Invalid token format`, 'error');
+                }
+            }
+            
+            log(`👤 User: ${user || 'None'}`);
+        }
+
+        function clearStorage() {
+            localStorage.clear();
+            sessionStorage.clear();
+            log('🗑️ Storage cleared', 'success');
+        }
+
+        // Initialize
+        log(`🌐 API URL: ${API_URL}`);
+        log(`📍 Current location: ${window.location.href}`);
+        log('🚀 Debug page loaded');
+    </script>
+</body>
+</html>

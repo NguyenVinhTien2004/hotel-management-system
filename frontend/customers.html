@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý khách hàng - Khách sạn Cây Dừa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="dashboard.html" class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold mr-3">CD</a>
+                    <h1 class="text-xl font-semibold">Quản lý khách hàng</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showAddCustomerModal()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Thêm khách hàng</button>
+                    <button onclick="logout()" class="text-red-600 hover:text-red-700">Đăng xuất</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 py-6 sm:px-0">
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Danh sách khách hàng</h3>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên khách hàng</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số điện thoại</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Địa chỉ</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTableBody" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Customer Modal -->
+    <div id="addCustomerModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Thêm khách hàng mới</h3>
+                </div>
+                <form id="addCustomerForm" class="px-6 py-4 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tên khách hàng</label>
+                        <input type="text" id="customerName" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                        <input type="tel" id="customerPhone" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="customerEmail" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
+                        <textarea id="customerAddress" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Số CMND/CCCD</label>
+                        <input type="text" id="customerIdNumber" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="hideAddCustomerModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Hủy</button>
+                        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Thêm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001/api';
+        
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+        
+        function showAddCustomerModal() {
+            document.getElementById('addCustomerModal').classList.remove('hidden');
+        }
+        
+        function hideAddCustomerModal() {
+            document.getElementById('addCustomerModal').classList.add('hidden');
+            document.getElementById('addCustomerForm').reset();
+        }
+        
+        async function loadCustomers() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/customers`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayCustomers(data.customers || []);
+                }
+            } catch (error) {
+                console.error('Error loading customers:', error);
+            }
+        }
+        
+        function displayCustomers(customers) {
+            const tbody = document.getElementById('customersTableBody');
+            tbody.innerHTML = customers.map(customer => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${customer.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${customer.phone || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${customer.email || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${customer.address || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="editCustomer(${customer.id})" class="text-indigo-600 hover:text-indigo-900 mr-3">Sửa</button>
+                        <button onclick="deleteCustomer(${customer.id})" class="text-red-600 hover:text-red-900">Xóa</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        document.getElementById('addCustomerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const token = localStorage.getItem('token');
+            const customerData = {
+                name: document.getElementById('customerName').value,
+                phone: document.getElementById('customerPhone').value,
+                email: document.getElementById('customerEmail').value,
+                address: document.getElementById('customerAddress').value,
+                id_number: document.getElementById('customerIdNumber').value
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/customers`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(customerData)
+                });
+                
+                if (response.ok) {
+                    hideAddCustomerModal();
+                    loadCustomers();
+                    alert('Thêm khách hàng thành công!');
+                } else {
+                    const error = await response.json();
+                    alert(error.message || 'Có lỗi xảy ra');
+                }
+            } catch (error) {
+                alert('Lỗi kết nối server');
+            }
+        });
+        
+        checkAuth();
+        loadCustomers();
+    </script>
+</body>
+</html>

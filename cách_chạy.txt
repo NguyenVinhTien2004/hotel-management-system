@@ -1,0 +1,70 @@
+=== HƯỚNG DẪN CHẠY ỨNG DỤNG ===
+
+*** SỬA LỖI CACHE (khi đặt phòng không tự động cập nhật) ***
+1. Nhấn F12 trong trình duyệt
+2. Chuột phải vào nút Refresh
+3. Chọn "Empty Cache and Hard Reload"
+4. HOẶC nhấn Ctrl + Shift + R
+5. Restart server: Ctrl+C trong terminal backend, rồi chạy lại "node server.js"
+
+1. SETUP DATABASE (chỉ chạy lần đầu):
+   - Mở MySQL và tạo database: CREATE DATABASE quanlykhachsan;
+   - Chạy: mysql -u root -p quanlykhachsan < backend\database_schema.sql
+   - Chạy: mysql -u root -p quanlykhachsan < backend\reset_rooms_20.sql
+   - Chạy: mysql -u root -p quanlykhachsan < fix_room_prices.sql
+   - Chạy: mysql -u root -p quanlykhachsan < add_service_ratings_table.sql
+   - Chạy: mysql -u root -p quanlykhachsan < fix_service_prices.sql
+   - Chạy: mysql -u root -p quanlykhachsan < clean_price_data.sql
+   - (Tùy chọn) Chạy: mysql -u root -p quanlykhachsan < format_price_view.sql
+
+2. CHẠY SERVER:
+   - cd backend (nếu terminal chưa ở thư mục backend)
+   - node server.js
+
+3. CHẠY FRONTEND:
+   - Mở trình duyệt và truy cập: http://localhost:3000
+   - HOẶC click chuột phải vào file index.html và chọn "Open with Live Server"
+   - Lưu ý: Frontend được serve trực tiếp từ backend server (port 3001)
+   
+   LƯU Ý: Sử dụng thư mục frontend ở gốc (đã sửa lỗi), không phải frontend-20251108T081940Z-1-001
+
+*** TÀI KHOẢN MẶC ĐỊNH ***
+Admin/Nhân viên: admin / @@@@
+Khách hàng: Tự đăng ký tại trang chủ
+
+4. SỬ DỤNG TRÊN MOBILE:
+   - Mở trình duyệt mobile và truy cập: http://[IP_MÁY_TÍNH]:3001/index.html
+   - Trên Chrome mobile: Menu → "Add to Home screen" để tạo app icon
+   - Trên Safari iOS: Share → "Add to Home Screen"
+
+=== DEPLOY LÊN RENDER ===
+
+1. PUSH CODE LÊN GITHUB:
+   - cd "D:\Jupyter notebook\app_nhom"
+   - .\push.bat
+   - GitHub: https://bit.ly/khách_sạn_cocotier-app
+
+2. DEPLOY TRÊN RENDER:
+   - Vào render.com → Sign up/Login
+   - New → Web Service
+   - Connect GitHub repo: app_nhom
+   - Build Command: npm install
+   - Start Command: npm start
+   - Environment: Node
+   - Plan: Free
+
+3. TẠO DATABASE:
+   - Render Dashboard → New → PostgreSQL
+   - Name: hotel-db
+   - Plan: Free
+   - Copy connection string
+
+4. CẤU HÌNH ENVIRONMENT VARIABLES:
+   - Trong Web Service → Environment
+   - Thêm: DATABASE_URL=[connection string từ bước 3]
+   - PORT=10000 (Render tự set)
+
+5. TRUY CẬP:
+   - URL: https://[your-app-name].onrender.com
+
+

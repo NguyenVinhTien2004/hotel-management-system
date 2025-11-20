@@ -1,0 +1,210 @@
+/* New Cocotier Logo with Palm Trees, Sun and Waves */
+.cocotier-logo-new {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-circle {
+    width: 40px;
+    height: 40px;
+    position: relative;
+    margin-right: 12px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #F4D03F 0%, #F39C12 100%);
+    overflow: hidden;
+}
+
+.logo-circle-large {
+    width: 60px;
+    height: 60px;
+    margin-right: 16px;
+}
+
+/* Sun background */
+.sun-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #F7DC6F 0%, #F39C12 100%);
+    border-radius: 50%;
+}
+
+/* Palm trees */
+.palm-container {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 70%;
+}
+
+.palm-tree-new {
+    position: absolute;
+    bottom: 0;
+}
+
+.palm-tree-1 {
+    left: 20%;
+    transform: scale(0.8);
+}
+
+.palm-tree-2 {
+    right: 20%;
+    transform: scale(0.6);
+}
+
+/* Palm trunk */
+.palm-trunk {
+    width: 3px;
+    height: 12px;
+    background: #8B4513;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 1px;
+}
+
+/* Palm leaves */
+.palm-leaves {
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 8px;
+}
+
+.palm-leaf {
+    position: absolute;
+    width: 8px;
+    height: 4px;
+    background: #228B22;
+    border-radius: 50% 0;
+    transform-origin: bottom center;
+}
+
+.leaf-1 { transform: rotate(-45deg) translateY(-2px); }
+.leaf-2 { transform: rotate(-15deg) translateY(-2px); }
+.leaf-3 { transform: rotate(15deg) translateY(-2px); }
+.leaf-4 { transform: rotate(45deg) translateY(-2px); }
+
+/* Waves */
+.waves {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    overflow: hidden;
+}
+
+.wave {
+    position: absolute;
+    bottom: 0;
+    width: 120%;
+    height: 6px;
+    background: #3498DB;
+    border-radius: 50% 50% 0 0;
+    opacity: 0.8;
+}
+
+.wave-1 {
+    left: -10%;
+    animation: wave-motion 3s ease-in-out infinite;
+}
+
+.wave-2 {
+    left: -5%;
+    height: 4px;
+    background: #5DADE2;
+    animation: wave-motion 3s ease-in-out infinite reverse;
+}
+
+@keyframes wave-motion {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(-5px); }
+}
+
+/* Logo text */
+.logo-text-new {
+    font-weight: 700;
+    color: #2C3E50;
+    font-size: 18px;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.logo-text-new-large {
+    font-size: 24px;
+    letter-spacing: 2px;
+}
+
+/* Mini version for navbar */
+.cocotier-logo-mini {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-circle-mini {
+    width: 28px;
+    height: 28px;
+    margin-right: 8px;
+}
+
+.logo-circle-mini .palm-container {
+    bottom: 6px;
+}
+
+.logo-circle-mini .palm-trunk {
+    width: 2px;
+    height: 8px;
+}
+
+.logo-circle-mini .palm-leaves {
+    width: 8px;
+    height: 6px;
+}
+
+.logo-circle-mini .palm-leaf {
+    width: 5px;
+    height: 3px;
+}
+
+.logo-circle-mini .waves {
+    height: 5px;
+}
+
+.logo-text-mini {
+    font-weight: 700;
+    color: #2C3E50;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+}
+
+/* Hover effects */
+.cocotier-logo-new:hover .logo-circle,
+.cocotier-logo-mini:hover .logo-circle-mini {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+.cocotier-logo-new:hover .palm-leaf,
+.cocotier-logo-mini:hover .palm-leaf {
+    animation: palm-sway 2s ease-in-out infinite;
+}
+
+@keyframes palm-sway {
+    0%, 100% { transform: rotate(var(--rotation)) translateY(-2px); }
+    50% { transform: rotate(calc(var(--rotation) + 5deg)) translateY(-2px); }
+}
+
+.leaf-1 { --rotation: -45deg; }
+.leaf-2 { --rotation: -15deg; }
+.leaf-3 { --rotation: 15deg; }
+.leaf-4 { --rotation: 45deg; }

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết dịch vụ - Khách sạn Cây Dừa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .star-rating {
+            display: flex;
+            gap: 2px;
+        }
+        .star {
+            color: #fbbf24;
+            font-size: 1.2rem;
+        }
+        .star.empty {
+            color: #d1d5db;
+        }
+        .rating-bar {
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .rating-fill {
+            height: 100%;
+            background-color: #fbbf24;
+            transition: width 0.3s ease;
+        }
+        .review-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            background: white;
+        }
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+        .rating-input {
+            display: flex;
+            gap: 4px;
+            margin: 16px 0;
+        }
+        .rating-input .star {
+            font-size: 2rem;
+            color: #d1d5db;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .rating-input .star.active {
+            color: #fbbf24;
+        }
+        .rating-input .star:hover {
+            color: #fbbf24;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <button onclick="goBack()" class="mr-4 text-gray-600 hover:text-gray-900">
+                        ← Quay lại
+                    </button>
+                    <a href="dashboard.html" class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold mr-3">CD</a>
+                    <h1 class="text-xl font-semibold">Chi tiết dịch vụ</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-600" id="userInfo"></span>
+                    <button onclick="logout()" class="text-red-600 hover:text-red-700">Đăng xuất</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto py-6 px-4">
+        <!-- Service Info -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div class="flex items-start space-x-6">
+                <div id="serviceIcon" class="service-icon bg-blue-100 text-blue-600">
+                    🛎️
+                </div>
+                <div class="flex-1">
+                    <h2 id="serviceName" class="text-2xl font-bold text-gray-900 mb-2">Tên dịch vụ</h2>
+                    <p id="serviceDescription" class="text-gray-600 mb-4">Mô tả dịch vụ</p>
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="star-rating" id="averageRating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star empty">★</span>
+                        </div>
+                        <span id="ratingText" class="text-sm text-gray-600">4.0 (0 đánh giá)</span>
+                    </div>
+                    <div class="text-2xl font-bold text-green-600" id="servicePrice">0 VND</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rating Distribution -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Phân bố đánh giá</h3>
+            <div class="space-y-2" id="ratingDistribution">
+                <!-- Rating bars will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Add Rating Form -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Đánh giá dịch vụ này</h3>
+            <form id="ratingForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Đánh giá của bạn</label>
+                    <div class="rating-input" id="ratingInput">
+                        <span class="star" data-value="1">★</span>
+                        <span class="star" data-value="2">★</span>
+                        <span class="star" data-value="3">★</span>
+                        <span class="star" data-value="4">★</span>
+                        <span class="star" data-value="5">★</span>
+                    </div>
+                    <p class="text-sm text-gray-500" id="ratingLabel">Chọn số sao</p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nhận xét</label>
+                    <textarea 
+                        id="ratingComment" 
+                        rows="3" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="Chia sẻ trải nghiệm của bạn về dịch vụ này...">
+                    </textarea>
+                </div>
+                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700">
+                    Gửi đánh giá
+                </button>
+            </form>
+        </div>
+
+        <!-- Reviews List -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Đánh giá từ khách hàng</h3>
+            <div id="reviewsList">
+                <!-- Reviews will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001/api';
+        let currentServiceId = null;
+        let currentRating = 0;
+
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            document.getElementById('userInfo').textContent = user.name || user.username;
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function getServiceIcon(category) {
+            const icons = {
+                'food': '🍽️',
+                'transport': '🚗', 
+                'spa': '💆',
+                'laundry': '👕',
+                'other': '⭐'
+            };
+            return icons[category] || '🛎️';
+        }
+
+        function getServiceIconClass(category) {
+            const classes = {
+                'food': 'bg-orange-100 text-orange-600',
+                'transport': 'bg-blue-100 text-blue-600',
+                'spa': 'bg-purple-100 text-purple-600', 
+                'laundry': 'bg-cyan-100 text-cyan-600',
+                'other': 'bg-gray-100 text-gray-600'
+            };
+            return classes[category] || 'bg-gray-100 text-gray-600';
+        }
+
+        function displayStars(rating, container) {
+            const stars = container.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < Math.floor(rating)) {
+                    star.classList.remove('empty');
+                } else {
+                    star.classList.add('empty');
+                }
+            });
+        }
+
+        async function loadServiceDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentServiceId = urlParams.get('id');
+            
+            if (!currentServiceId) {
+                alert('Không tìm thấy dịch vụ');
+                window.location.href = 'service-rating.html';
+                return;
+            }
+
+            try {
+                // Load service info and stats
+                const response = await fetch(`${API_URL}/services/${currentServiceId}/stats`);
+                if (response.ok) {
+                    const data = await response.json();
+                    displayServiceInfo(data);
+                }
+
+                // Load reviews
+                loadServiceReviews();
+            } catch (error) {
+                console.error('Error loading service details:', error);
+            }
+        }
+
+        function displayServiceInfo(data) {
+            const service = data.service;
+            
+            document.getElementById('serviceName').textContent = service.name;
+            document.getElementById('serviceDescription').textContent = service.description || 'Dịch vụ chất lượng cao';
+            document.getElementById('servicePrice').textContent = service.price.toLocaleString('vi-VN') + ' VND';
+            
+            // Update icon
+            const iconElement = document.getElementById('serviceIcon');
+            iconElement.textContent = getServiceIcon(service.category);
+            iconElement.className = `service-icon ${getServiceIconClass(service.category)}`;
+            
+            // Update rating
+            const avgRating = parseFloat(data.averageRating) || 0;
+            displayStars(avgRating, document.getElementById('averageRating'));
+            document.getElementById('ratingText').textContent = `${data.averageRating || '0.0'} (${data.totalRatings} đánh giá)`;
+            
+            // Update rating distribution
+            displayRatingDistribution(data.ratingDistribution, data.totalRatings);
+        }
+
+        function displayRatingDistribution(distribution, total) {
+            const container = document.getElementById('ratingDistribution');
+            container.innerHTML = '';
+            
+            for (let i = 5; i >= 1; i--) {
+                const count = distribution[i] || 0;
+                const percentage = total > 0 ? (count / total) * 100 : 0;
+                
+                const row = document.createElement('div');
+                row.className = 'flex items-center space-x-3';
+                row.innerHTML = `
+                    <span class="text-sm w-8">${i} ⭐</span>
+                    <div class="flex-1 rating-bar">
+                        <div class="rating-fill" style="width: ${percentage}%"></div>
+                    </div>
+                    <span class="text-sm text-gray-600 w-12">${count}</span>
+                `;
+                container.appendChild(row);
+            }
+        }
+
+        async function loadServiceReviews() {
+            try {
+                const response = await fetch(`${API_URL}/service-ratings?service_id=${currentServiceId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    displayReviews(data.ratings || []);
+                }
+            } catch (error) {
+                console.error('Error loading reviews:', error);
+            }
+        }
+
+        function displayReviews(reviews) {
+            const container = document.getElementById('reviewsList');
+            
+            if (reviews.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">Chưa có đánh giá nào cho dịch vụ này</p>';
+                return;
+            }
+            
+            container.innerHTML = reviews.map(review => `
+                <div class="review-card">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <h5 class="font-semibold text-gray-900">${review.customer_name}</h5>
+                            <div class="star-rating">
+                                ${Array.from({length: 5}, (_, i) => 
+                                    `<span class="star ${i < review.rating ? '' : 'empty'}">★</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+                        <span class="text-sm text-gray-500">${new Date(review.created_at).toLocaleDateString('vi-VN')}</span>
+                    </div>
+                    ${review.comment ? `<p class="text-gray-700">${review.comment}</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Rating input functionality
+        document.querySelectorAll('#ratingInput .star').forEach((star, index) => {
+            star.addEventListener('click', () => {
+                currentRating = index + 1;
+                updateRatingInput();
+                updateRatingLabel();
+            });
+            
+            star.addEventListener('mouseover', () => {
+                updateRatingInputHover(index + 1);
+            });
+        });
+
+        document.getElementById('ratingInput').addEventListener('mouseleave', () => {
+            updateRatingInput();
+        });
+
+        function updateRatingInput() {
+            const stars = document.querySelectorAll('#ratingInput .star');
+            stars.forEach((star, index) => {
+                if (index < currentRating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        function updateRatingInputHover(rating) {
+            const stars = document.querySelectorAll('#ratingInput .star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        function updateRatingLabel() {
+            const labels = {
+                1: 'Rất tệ',
+                2: 'Tệ',
+                3: 'Bình thường', 
+                4: 'Tốt',
+                5: 'Xuất sắc'
+            };
+            document.getElementById('ratingLabel').textContent = labels[currentRating] || 'Chọn số sao';
+        }
+
+        // Form submission
+        document.getElementById('ratingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (currentRating === 0) {
+                alert('Vui lòng chọn số sao đánh giá');
+                return;
+            }
+            
+            const comment = document.getElementById('ratingComment').value;
+            const token = localStorage.getItem('token');
+            
+            // Get booking ID - in real app this would come from user's booking history
+            // For demo, we'll use a default booking ID
+            const bookingId = 1;
+            
+            try {
+                const response = await fetch(`${API_URL}/service-ratings`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        service_id: currentServiceId,
+                        booking_id: bookingId,
+                        rating: currentRating,
+                        comment: comment
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('Cảm ơn bạn đã đánh giá dịch vụ!');
+                    // Reset form
+                    currentRating = 0;
+                    updateRatingInput();
+                    updateRatingLabel();
+                    document.getElementById('ratingComment').value = '';
+                    
+                    // Reload data
+                    loadServiceDetails();
+                } else {
+                    const error = await response.json();
+                    alert(error.message || 'Có lỗi xảy ra khi gửi đánh giá');
+                }
+            } catch (error) {
+                alert('Lỗi kết nối server');
+            }
+        });
+
+        // Initialize
+        checkAuth();
+        loadServiceDetails();
+    </script>
+</body>
+</html>

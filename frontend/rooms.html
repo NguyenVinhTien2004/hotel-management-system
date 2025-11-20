@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý phòng - Khách sạn Cây Dừa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="dashboard.html" class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold mr-3">CD</a>
+                    <h1 class="text-xl font-semibold">Quản lý phòng</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showAddRoomModal()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Thêm phòng</button>
+                    <button onclick="logout()" class="text-red-600 hover:text-red-700">Đăng xuất</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 py-6 sm:px-0">
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-medium text-gray-900">Danh sách phòng</h3>
+                        <div class="flex space-x-2">
+                            <select id="roomTypeFilter" class="border border-gray-300 rounded-md px-3 py-2">
+                                <option value="">Tất cả loại phòng</option>
+                                <option value="Phòng Đơn">Phòng Đơn</option>
+                                <option value="Phòng Đôi">Phòng Đôi</option>
+                                <option value="Phòng Gia Đình">Phòng Gia Đình</option>
+                            </select>
+                            <select id="statusFilter" class="border border-gray-300 rounded-md px-3 py-2">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="available">Có sẵn</option>
+                                <option value="occupied">Đã đặt</option>
+                                <option value="maintenance">Bảo trì</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số phòng</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại phòng</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="roomsTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Rooms will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Room Modal -->
+    <div id="addRoomModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Thêm phòng mới</h3>
+                </div>
+                <form id="addRoomForm" class="px-6 py-4 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Số phòng</label>
+                        <input type="text" id="roomNumber" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Loại phòng</label>
+                        <select id="roomType" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option value="">Chọn loại phòng</option>
+                            <option value="Phòng Đơn">Phòng Đơn</option>
+                            <option value="Phòng Đôi">Phòng Đôi</option>
+                            <option value="Phòng Gia Đình">Phòng Gia Đình</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Giá (VND)</label>
+                        <input type="number" id="roomPrice" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="hideAddRoomModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Hủy</button>
+                        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Thêm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001/api';
+        
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'index.html';
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+        
+        function showAddRoomModal() {
+            document.getElementById('addRoomModal').classList.remove('hidden');
+        }
+        
+        function hideAddRoomModal() {
+            document.getElementById('addRoomModal').classList.add('hidden');
+            document.getElementById('addRoomForm').reset();
+        }
+        
+        async function loadRooms() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/rooms`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayRooms(data.rooms || []);
+                }
+            } catch (error) {
+                console.error('Error loading rooms:', error);
+            }
+        }
+        
+        function displayRooms(rooms) {
+            const tbody = document.getElementById('roomsTableBody');
+            tbody.innerHTML = rooms.map(room => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${room.number}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${room.type}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${room.price.toLocaleString('vi-VN')} VND</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(room.status)}">
+                            ${getStatusText(room.status)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="viewRoomDetail(${room.id})" class="text-blue-600 hover:text-blue-900 mr-3">Xem chi tiết</button>
+                        <button onclick="editRoom(${room.id})" class="text-indigo-600 hover:text-indigo-900 mr-3">Sửa</button>
+                        <button onclick="deleteRoom(${room.id})" class="text-red-600 hover:text-red-900">Xóa</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function getStatusColor(status) {
+            switch(status) {
+                case 'available': return 'bg-green-100 text-green-800';
+                case 'occupied': return 'bg-red-100 text-red-800';
+                case 'maintenance': return 'bg-yellow-100 text-yellow-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+        
+        function getStatusText(status) {
+            switch(status) {
+                case 'available': return 'Có sẵn';
+                case 'occupied': return 'Đã đặt';
+                case 'maintenance': return 'Bảo trì';
+                default: return 'Không xác định';
+            }
+        }
+        
+        document.getElementById('addRoomForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const token = localStorage.getItem('token');
+            const roomData = {
+                number: document.getElementById('roomNumber').value,
+                type: document.getElementById('roomType').value,
+                price: parseInt(document.getElementById('roomPrice').value)
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/rooms`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(roomData)
+                });
+                
+                if (response.ok) {
+                    hideAddRoomModal();
+                    loadRooms();
+                    alert('Thêm phòng thành công!');
+                } else {
+                    const error = await response.json();
+                    alert(error.message || 'Có lỗi xảy ra');
+                }
+            } catch (error) {
+                alert('Lỗi kết nối server');
+            }
+        });
+        
+        function viewRoomDetail(roomId) {
+            window.location.href = `room-detail.html?id=${roomId}`;
+        }
+        
+        async function deleteRoom(roomId) {
+            if (!confirm('Bạn có chắc chắn muốn xóa phòng này?')) return;
+            
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/rooms/${roomId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    loadRooms();
+                    alert('Xóa phòng thành công!');
+                }
+            } catch (error) {
+                alert('Lỗi kết nối server');
+            }
+        }
+        
+        checkAuth();
+        loadRooms();
+    </script>
+</body>
+</html>

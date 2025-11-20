@@ -1,0 +1,411 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
+      "name": "Administrator",
+      "email": "admin@hotel.com",
+      "role": "admin"
+    },
+    {
+      "id": 2,
+      "username": "TyTi",
+      "name": "Nguyễn Vĩnh Tiến ",
+      "email": "nguyenvinhtien641@gmail.com",
+      "password": "$2a$10$BCynbN3GGRAFjWDzfhJGF.6XfNkuAytTboZgWyah.JmJQ53FlXA66",
+      "role": "customer"
+    }
+  ],
+  "rooms": [
+    {
+      "id": 1,
+      "number": "101",
+      "name": "Phòng Hoa Sen",
+      "type": "Đơn",
+      "price": 500000,
+      "status": "occupied",
+      "capacity": 1,
+      "image": ""
+    },
+    {
+      "id": 2,
+      "number": "102",
+      "name": "Phòng Hoa Đào",
+      "type": "Đơn",
+      "price": 500000,
+      "status": "occupied",
+      "capacity": 1,
+      "image": ""
+    },
+    {
+      "id": 3,
+      "number": "103",
+      "name": "Phòng Hoa Mai",
+      "type": "Đơn",
+      "price": 500000,
+      "status": "occupied",
+      "capacity": 1,
+      "image": ""
+    },
+    {
+      "id": 4,
+      "number": "104",
+      "name": "Phòng Hoa Cúc",
+      "type": "Đơn",
+      "price": 500000,
+      "status": "available",
+      "capacity": 1,
+      "image": ""
+    },
+    {
+      "id": 5,
+      "number": "201",
+      "name": "Phòng Biển Xanh",
+      "type": "Đôi",
+      "price": 800000,
+      "status": "occupied",
+      "capacity": 2,
+      "image": ""
+    },
+    {
+      "id": 6,
+      "number": "202",
+      "name": "Phòng Biển Bạc",
+      "type": "Đôi",
+      "price": 800000,
+      "status": "occupied",
+      "capacity": 2,
+      "image": ""
+    },
+    {
+      "id": 7,
+      "number": "203",
+      "name": "Phòng Biển Vàng",
+      "type": "Đôi",
+      "price": 800000,
+      "status": "available",
+      "capacity": 2,
+      "image": ""
+    },
+    {
+      "id": 8,
+      "number": "204",
+      "name": "Phòng Biển Ngọc",
+      "type": "Đôi",
+      "price": 800000,
+      "status": "available",
+      "capacity": 2,
+      "image": ""
+    },
+    {
+      "id": 9,
+      "number": "301",
+      "name": "Phòng Gia Đình Hạnh Phúc",
+      "type": "Gia Đình",
+      "price": 1200000,
+      "status": "occupied",
+      "capacity": 4,
+      "image": ""
+    },
+    {
+      "id": 10,
+      "number": "302",
+      "name": "Phòng Gia Đình Yêu Thương",
+      "type": "Gia Đình",
+      "price": 1200000,
+      "status": "maintenance",
+      "capacity": 4,
+      "image": ""
+    },
+    {
+      "id": 11,
+      "number": "303",
+      "name": "Phòng Gia Đình Ấm Áp",
+      "type": "Gia Đình",
+      "price": 1200000,
+      "status": "available",
+      "capacity": 4,
+      "image": ""
+    },
+    {
+      "id": 12,
+      "number": "304",
+      "name": "Phòng Gia Đình Bình An",
+      "type": "Gia Đình",
+      "price": 1200000,
+      "status": "available",
+      "capacity": 4,
+      "image": ""
+    },
+    {
+      "id": 13,
+      "number": "401",
+      "name": "Phòng VIP Hoàng Gia",
+      "type": "VIP",
+      "price": 2000000,
+      "status": "available",
+      "capacity": 2,
+      "image": ""
+    },
+    {
+      "id": 14,
+      "number": "402",
+      "name": "Phòng VIP Tổng Thống",
+      "type": "VIP",
+      "price": 2000000,
+      "status": "available",
+      "capacity": 2,
+      "image": ""
+    },
+    {
+      "id": 15,
+      "number": "403",
+      "name": "Phòng VIP Hoàng Hậu",
+      "type": "VIP",
+      "price": 2000000,
+      "status": "available",
+      "capacity": 2,
+      "image": ""
+    },
+    {
+      "id": 16,
+      "number": "404",
+      "name": "Phòng VIP Thiên Đường",
+      "type": "VIP",
+      "price": 2000000,
+      "status": "available",
+      "capacity": 2,
+      "image": ""
+    }
+  ],
+  "bookings": [
+    {
+      "id": 1,
+      "customer_name": "Nguyễn Văn A",
+      "customer_phone": "0123456789",
+      "customer_email": "nguyenvana@email.com",
+      "room_id": 6,
+      "room_number": "202",
+      "check_in": "2024-01-15",
+      "check_out": "2024-01-17",
+      "guest_count": 2,
+      "total_amount": 1600000,
+      "status": "confirmed"
+    },
+    {
+      "id": 2,
+      "customer_name": "Tiến ",
+      "customer_phone": "5555",
+      "customer_email": "nguyenvinhtien641@gmail.com",
+      "room_id": 1,
+      "room_number": "101",
+      "check_in": "2025-11-08",
+      "check_out": "2025-11-30",
+      "guest_count": 1,
+      "total_amount": 11000000,
+      "status": "confirmed"
+    },
+    {
+      "id": 3,
+      "customer_name": "Vinh ",
+      "customer_phone": "2004",
+      "customer_email": "vinhnguyen2004@gmail.com",
+      "room_id": 3,
+      "room_number": "201",
+      "check_in": "2025-11-08",
+      "check_out": "2025-11-10",
+      "guest_count": 2,
+      "total_amount": 1600000,
+      "status": "confirmed"
+    },
+    {
+      "id": 4,
+      "customer_name": "Nguyễn Vĩnh Tiến ",
+      "customer_phone": "",
+      "customer_email": "nguyenvinhtien641@gmail.com",
+      "room_id": 2,
+      "room_number": "102",
+      "check_in": "2025-11-08",
+      "check_out": "2025-11-10",
+      "guest_count": 2,
+      "total_amount": 1100000,
+      "payment_method": "cash",
+      "status": "confirmed"
+    },
+    {
+      "id": 5,
+      "customer_name": "Tiến ",
+      "customer_phone": "5555",
+      "customer_email": "nguyenvinhtien641@gmail.com",
+      "room_id": 5,
+      "room_number": "301",
+      "check_in": "2025-11-08",
+      "check_out": "2025-11-11",
+      "guest_count": 2,
+      "total_amount": 3600000,
+      "payment_method": "cash",
+      "status": "confirmed"
+    },
+    {
+      "id": 6,
+      "customer_name": "Tiến ",
+      "customer_phone": "0000",
+      "customer_email": "nguyenvinhtien641@gmail.com",
+      "room_id": 3,
+      "room_number": "103",
+      "room_name": "Phòng Hoa Mai",
+      "room_type": "Đơn",
+      "check_in": "2025-11-08",
+      "check_out": "2025-11-11",
+      "guest_count": 1,
+      "total_amount": 1500000,
+      "payment_method": "bank_transfer",
+      "status": "pending"
+    }
+  ],
+  "customers": [
+    {
+      "id": 1,
+      "name": "Nguyễn Văn A",
+      "phone": "0123456789",
+      "email": "nguyenvana@email.com",
+      "address": "TP.HCM",
+      "id_number": "123456789"
+    },
+    {
+      "id": 2,
+      "name": "Tiến ",
+      "phone": "5555",
+      "email": "nguyenvinhtien641@gmail.com",
+      "address": "",
+      "id_number": ""
+    },
+    {
+      "id": 3,
+      "name": "Vinh ",
+      "phone": "2004",
+      "email": "vinhnguyen2004@gmail.com",
+      "address": "",
+      "id_number": ""
+    },
+    {
+      "id": 4,
+      "name": "Nguyễn Vĩnh Tiến ",
+      "phone": "",
+      "email": "nguyenvinhtien641@gmail.com",
+      "address": "",
+      "id_number": ""
+    },
+    {
+      "id": 5,
+      "name": "Tiến ",
+      "phone": "0000",
+      "email": "nguyenvinhtien641@gmail.com",
+      "address": "",
+      "id_number": ""
+    }
+  ],
+  "services": [
+    {
+      "id": 1,
+      "name": "Giặt ủi",
+      "price": 50000,
+      "category": "laundry"
+    },
+    {
+      "id": 2,
+      "name": "Massage",
+      "price": 200000,
+      "category": "spa"
+    },
+    {
+      "id": 3,
+      "name": "Đưa đón sân bay",
+      "price": 300000,
+      "category": "transport"
+    }
+  ],
+  "invoices": [
+    {
+      "id": 1,
+      "booking_id": 4,
+      "customer_name": "Nguyễn Vĩnh Tiến ",
+      "customer_phone": "",
+      "customer_email": "nguyenvinhtien641@gmail.com",
+      "room_number": "102",
+      "room_charges": 1100000,
+      "service_charges": 0,
+      "total_amount": 1100000,
+      "payment_method": "cash",
+      "status": "pending",
+      "check_in": "2025-11-08",
+      "check_out": "2025-11-10",
+      "created_at": "2025-11-08T04:28:35.752Z",
+      "services": []
+    },
+    {
+      "id": 2,
+      "booking_id": 5,
+      "customer_name": "Tiến ",
+      "customer_phone": "5555",
+      "customer_email": "nguyenvinhtien641@gmail.com",
+      "room_number": "301",
+      "room_charges": 3600000,
+      "service_charges": 0,
+      "total_amount": 3600000,
+      "payment_method": "cash",
+      "status": "pending",
+      "check_in": "2025-11-08",
+      "check_out": "2025-11-11",
+      "created_at": "2025-11-08T04:30:10.597Z",
+      "services": []
+    },
+    {
+      "id": 3,
+      "booking_id": 6,
+      "customer_name": "Tiến ",
+      "customer_phone": "0000",
+      "customer_email": "nguyenvinhtien641@gmail.com",
+      "room_number": "103",
+      "room_charges": 1500000,
+      "service_charges": 0,
+      "total_amount": 1500000,
+      "payment_method": "bank_transfer",
+      "status": "pending",
+      "check_in": "2025-11-08",
+      "check_out": "2025-11-11",
+      "created_at": "2025-11-08T08:27:57.737Z",
+      "services": []
+    }
+  ],
+  "notifications": [
+    {
+      "id": 1,
+      "type": "new_booking",
+      "title": "Đặt phòng mới",
+      "message": "Khách hàng Nguyễn Vĩnh Tiến  vừa đặt phòng 102",
+      "booking_id": 4,
+      "read": false,
+      "created_at": "2025-11-08T04:28:35.753Z"
+    },
+    {
+      "id": 2,
+      "type": "new_booking",
+      "title": "Đặt phòng mới",
+      "message": "Khách hàng Tiến  vừa đặt phòng 301",
+      "booking_id": 5,
+      "read": false,
+      "created_at": "2025-11-08T04:30:10.598Z"
+    },
+    {
+      "id": 3,
+      "type": "new_booking",
+      "title": "Đặt phòng mới",
+      "message": "Khách hàng Tiến  vừa đặt phòng 103",
+      "booking_id": 6,
+      "read": false,
+      "created_at": "2025-11-08T08:27:57.739Z"
+    }
+  ]
+}

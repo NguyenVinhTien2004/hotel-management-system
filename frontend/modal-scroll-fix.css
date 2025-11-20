@@ -1,0 +1,75 @@
+/* Fix cho tất cả modal để có thanh cuộn */
+
+/* Modal backdrop có thể cuộn */
+.modal-backdrop,
+.fixed.inset-0 {
+    overflow-y: auto !important;
+}
+
+/* Modal container có thể cuộn */
+.modal-container {
+    max-height: 100vh !important;
+    overflow-y: auto !important;
+}
+
+/* Modal content có thể cuộn */
+.modal-content {
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+}
+
+/* Đảm bảo modal không bị cắt trên mobile */
+@media (max-width: 768px) {
+    .modal-content {
+        max-height: 95vh !important;
+        margin: 10px !important;
+    }
+    
+    .flex.items-center.justify-center.min-h-screen {
+        padding: 20px 0 !important;
+        align-items: flex-start !important;
+    }
+}
+
+/* Fix cho form đặt phòng cụ thể */
+#addBookingModal,
+#quickBookingModal,
+#feedbackModal {
+    overflow-y: auto !important;
+}
+
+#addBookingModal .bg-white,
+#quickBookingModal .bg-white,
+#feedbackModal .bg-white {
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+}
+
+/* Fix cho container dịch vụ */
+#servicesContainer {
+    max-height: 200px !important;
+    overflow-y: auto !important;
+}
+
+/* Scrollbar styling */
+.modal-content::-webkit-scrollbar,
+#servicesContainer::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track,
+#servicesContainer::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb,
+#servicesContainer::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover,
+#servicesContainer::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
