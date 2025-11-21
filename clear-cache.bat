@@ -31,6 +31,6 @@ echo HOAC nhan Ctrl + Shift + R
 echo ========================================
 echo.
 
-start http://localhost:3001/index.html
+start http://localhost:3002/index.html
 
 pause

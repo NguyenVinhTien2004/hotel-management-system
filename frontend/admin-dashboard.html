@@ -178,10 +178,19 @@
                         </div>
                     </div>
 
-                    <!-- Tài chính -->
-                    <button onclick="showTab('invoices')" class="tab-btn py-2 px-3 border-b-2 font-medium text-sm hover:text-blue-600" data-tab="invoices">
-                        💰 Hóa đơn
-                    </button>
+                    <!-- Tài chính dropdown -->
+                    <div class="relative">
+                        <button onclick="toggleDropdown('finance-dropdown')" class="tab-btn py-2 px-3 border-b-2 font-medium text-sm flex items-center space-x-1 hover:text-blue-600">
+                            <span>💰 Tài chính</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div id="finance-dropdown" class="dropdown-menu absolute top-full left-0 mt-1 w-48 bg-white rounded-md shadow-lg z-10 hidden">
+                            <button onclick="showTab('revenue'); closeAllDropdowns()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-md">Doanh thu</button>
+                            <button onclick="showTab('invoices'); closeAllDropdowns()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-md">Hóa đơn</button>
+                        </div>
+                    </div>
 
                     <!-- Báo cáo dropdown -->
                     <div class="relative">
@@ -197,6 +206,131 @@
                         </div>
                     </div>
                 </nav>
+            </div>
+        </div>
+
+        <!-- Revenue Tab -->
+        <div id="revenue-tab" class="tab-content hidden">
+            <div class="space-y-6">
+                <!-- Revenue Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gradient-to-r from-green-400 to-green-600 rounded-lg p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-green-100">Hôm nay</p>
+                                <p class="text-2xl font-bold" id="todayRevenue">0 VND</p>
+                            </div>
+                            <div class="text-3xl opacity-80">📅</div>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-blue-400 to-blue-600 rounded-lg p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100">Tháng này</p>
+                                <p class="text-2xl font-bold" id="monthRevenue">0 VND</p>
+                            </div>
+                            <div class="text-3xl opacity-80">📊</div>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-purple-400 to-purple-600 rounded-lg p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-purple-100">Năm này</p>
+                                <p class="text-2xl font-bold" id="yearRevenue">0 VND</p>
+                            </div>
+                            <div class="text-3xl opacity-80">🏆</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenue Filters -->
+                <div class="bg-white shadow rounded-lg p-6">
+                    <div class="flex flex-wrap items-center gap-4 mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">Báo cáo doanh thu chi tiết</h3>
+                        <div class="flex items-center space-x-2">
+                            <select id="revenuePeriod" class="border border-gray-300 rounded-md px-3 py-2">
+                                <option value="month">Tháng hiện tại</option>
+                                <option value="year">Năm hiện tại</option>
+                                <option value="custom">Tùy chọn</option>
+                            </select>
+                            <div id="customDateInputs" class="hidden flex items-center space-x-2">
+                                <input type="number" id="revenueYear" placeholder="Năm" min="2020" max="2030" class="border border-gray-300 rounded-md px-3 py-2 w-20">
+                                <input type="number" id="revenueMonth" placeholder="Tháng" min="1" max="12" class="border border-gray-300 rounded-md px-3 py-2 w-20">
+                            </div>
+                            <button onclick="loadRevenueData()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Xem</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Revenue Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">Tổng doanh thu</p>
+                            <p class="text-xl font-bold text-green-600" id="totalRevenue">0 VND</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">Số booking</p>
+                            <p class="text-xl font-bold text-blue-600" id="totalBookings">0</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">Doanh thu dịch vụ</p>
+                            <p class="text-xl font-bold text-purple-600" id="serviceRevenue">0 VND</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">Trung bình/booking</p>
+                            <p class="text-xl font-bold text-orange-600" id="avgRevenue">0 VND</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenue Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Daily Revenue -->
+                    <div class="bg-white shadow rounded-lg p-6">
+                        <h4 class="text-lg font-medium text-gray-900 mb-4">Doanh thu theo ngày</h4>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ngày</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Doanh thu</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Booking</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dailyRevenueTable" class="bg-white divide-y divide-gray-200">
+                                    <!-- Data sẽ được load ở đây -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Room Type Revenue -->
+                    <div class="bg-white shadow rounded-lg p-6">
+                        <h4 class="text-lg font-medium text-gray-900 mb-4">Doanh thu theo loại phòng</h4>
+                        <div class="space-y-3" id="roomTypeRevenue">
+                            <!-- Data sẽ được load ở đây -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Customers -->
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h4 class="text-lg font-medium text-gray-900 mb-4">Top khách hàng</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Khách hàng</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Điện thoại</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tổng chi tiêu</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Số booking</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topCustomersTable" class="bg-white divide-y divide-gray-200">
+                                <!-- Data sẽ được load ở đây -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -224,7 +358,7 @@
                     </button>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200" style="min-width: 1200px;">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
@@ -449,6 +583,20 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Tên khách hàng</label>
                             <input type="text" id="customerNameInvoice" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                            <input type="tel" id="customerPhone" required class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="0123456789">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Phương thức thanh toán</label>
+                            <select id="paymentMethod" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                <option value="">Chọn phương thức</option>
+                                <option value="cash">Tiền mặt</option>
+                                <option value="bank_transfer">Chuyển khoản ngân hàng</option>
+                            </select>
                         </div>
                     </div>
                     <div>

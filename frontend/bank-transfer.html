@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuyển khoản Ngân hàng</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        .form-container {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .bank-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .bank-info h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .bank-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .bank-detail:last-child {
+            border-bottom: none;
+        }
+        
+        .bank-detail strong {
+            color: #2c3e50;
+        }
+        
+        .copy-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .amount-input {
+            position: relative;
+        }
+        
+        .currency {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .security-notice {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .security-notice i {
+            color: #2ecc71;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1><i class="fas fa-money-bill-transfer"></i> Chuyển khoản ngân hàng</h1>
+        </div>
+        
+        <div class="form-container">
+            <div class="bank-info">
+                <h3><i class="fas fa-university"></i> Thông tin tài khoản nhận</h3>
+                <div class="bank-detail">
+                    <span>Ngân hàng:</span>
+                    <strong>Vietcombank (VCB) <button class="copy-btn" onclick="copyText('Vietcombank')">Copy</button></strong>
+                </div>
+                <div class="bank-detail">
+                    <span>Số tài khoản:</span>
+                    <strong>1234567890 <button class="copy-btn" onclick="copyText('1234567890')">Copy</button></strong>
+                </div>
+                <div class="bank-detail">
+                    <span>Chủ tài khoản:</span>
+                    <strong>KHACH SAN COCOTIER <button class="copy-btn" onclick="copyText('KHACH SAN COCOTIER')">Copy</button></strong>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="amount">Số tiền cần chuyển</label>
+                <div class="input-with-icon amount-input">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <input type="text" id="amount" class="form-control" placeholder="0" readonly>
+                    <div class="currency">VND</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="message">Nội dung chuyển khoản</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-comment"></i>
+                    <input type="text" id="message" class="form-control" placeholder="Thanh toan dat phong" readonly>
+                </div>
+                <button class="copy-btn" onclick="copyText(document.getElementById('message').value)" style="margin-top: 5px;">Copy nội dung</button>
+            </div>
+            
+            <button class="btn btn-primary" onclick="confirmTransfer()">
+                <i class="fas fa-check"></i> Đã chuyển khoản
+            </button>
+            
+            <div class="security-notice">
+                <i class="fas fa-shield-alt"></i>
+                <span>Vui lòng chuyển khoản đúng số tiền và nội dung để được xử lý nhanh chóng</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        // Lấy thông tin từ URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const amount = urlParams.get('amount') || '0';
+        const bookingId = urlParams.get('bookingId') || '';
+        const customerName = urlParams.get('customerName') || '';
+        const API_URL = AppConfig.getApiUrl();
+        
+        // Hiển thị số tiền
+        document.getElementById('amount').value = parseInt(amount).toLocaleString('vi-VN');
+        
+        // Tạo nội dung chuyển khoản
+        const message = `Thanh toan dat phong ${bookingId} ${customerName}`.substring(0, 50);
+        document.getElementById('message').value = message;
+        
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Đã copy: ' + text);
+            });
+        }
+        
+        function goBack() {
+            if (confirm('Bạn có chắc muốn quay lại? Thông tin chuyển khoản sẽ bị mất.')) {
+                localStorage.removeItem('pendingBooking');
+                window.history.back();
+            }
+        }
+        
+        async function confirmTransfer() {
+            if (confirm('Bạn đã chuyển khoản thành công?')) {
+                const pendingBooking = localStorage.getItem('pendingBooking');
+                if (!pendingBooking) {
+                    alert('Không tìm thấy thông tin đặt phòng!');
+                    return;
+                }
+                
+                const bookingData = JSON.parse(pendingBooking);
+                
+                try {
+                    const response = await fetch(`${API_URL}/bookings`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify(bookingData)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        localStorage.removeItem('pendingBooking');
+                        localStorage.removeItem('selectedRoom');
+                        localStorage.setItem('refreshDashboard', 'true');
+                        alert('Đặt phòng thành công! Chúng tôi đã nhận được thông tin chuyển khoản của bạn.');
+                        window.location.href = 'customer-dashboard.html';
+                    } else {
+                        alert(result.message || 'Đặt phòng thất bại. Vui lòng thử lại.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Lỗi kết nối. Vui lòng thử lại.');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

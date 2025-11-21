@@ -133,14 +133,19 @@ const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
+    console.log('🔑 Auth check - Token present:', !!token);
+    
     if (!token) {
+        console.log('❌ No token provided');
         return res.status(401).json({ message: 'Access token required' });
     }
 
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) {
+            console.log('❌ Token verification failed:', err.message);
             return res.status(403).json({ message: 'Invalid token' });
         }
+        console.log('✅ Token verified for user:', user.username);
         req.user = user;
         next();
     });
@@ -551,7 +556,13 @@ app.get('/api/bookings', authenticateToken, async (req, res) => {
 
 app.post('/api/bookings', authenticateToken, async (req, res) => {
     try {
+        console.log('📝 Booking request data:', req.body);
         const { customer_name, customer_phone, customer_email, room_id, check_in, check_out, guest_count, payment_method, selected_services } = req.body;
+        
+        // Validate required fields
+        if (!customer_name || !customer_phone || !customer_email || !room_id || !check_in || !check_out || !guest_count) {
+            return res.status(400).json({ message: 'Thiếu thông tin bắt buộc' });
+        }
         
         const [rooms] = await pool.execute('SELECT * FROM rooms WHERE id = ?', [room_id]);
         if (rooms.length === 0) {
@@ -593,20 +604,31 @@ app.post('/api/bookings', authenticateToken, async (req, res) => {
         );
         
         // Save selected services using existing invoice_services table
-        if (selected_services && selected_services.length > 0) {
-            // Create invoice for this booking with services
-            const [invoiceResult] = await pool.execute(
-                'INSERT INTO invoices (booking_id, customer_name, room_charges, service_charges, total_amount, status) VALUES (?, ?, ?, ?, ?, ?)',
-                [result.insertId, customer_name, roomAmount, servicesAmount, totalAmount, 'pending']
-            );
-            
-            // Add services to invoice_services
-            for (const service of selected_services) {
-                await pool.execute(
-                    'INSERT INTO invoice_services (invoice_id, service_id, service_name, quantity, price, total) VALUES (?, ?, ?, ?, ?, ?)',
-                    [invoiceResult.insertId, service.id, service.name, 1, service.price, service.price]
+        if (selected_services && Array.isArray(selected_services) && selected_services.length > 0) {
+            try {
+                console.log('🛠️ Creating invoice with services:', selected_services.length);
+                // Create invoice for this booking with services
+                const [invoiceResult] = await pool.execute(
+                    'INSERT INTO invoices (booking_id, customer_name, room_charges, service_charges, total_amount, status) VALUES (?, ?, ?, ?, ?, ?)',
+                    [result.insertId, customer_name, roomAmount, servicesAmount, totalAmount, 'pending']
                 );
+                
+                // Add services to invoice_services
+                for (const service of selected_services) {
+                    if (service && service.name && service.price) {
+                        await pool.execute(
+                            'INSERT INTO invoice_services (invoice_id, service_id, service_name, quantity, price, total) VALUES (?, ?, ?, ?, ?, ?)',
+                            [invoiceResult.insertId, service.id || null, service.name, 1, service.price, service.price]
+                        );
+                    }
+                }
+                console.log('✅ Invoice and services created successfully');
+            } catch (serviceError) {
+                console.error('❌ Error creating invoice/services:', serviceError);
+                // Don't fail the booking if services fail, just log the error
             }
+        } else {
+            console.log('📝 No services selected for this booking');
         }
         
         // Update room status to occupied
@@ -640,9 +662,11 @@ app.post('/api/bookings', authenticateToken, async (req, res) => {
             result.insertId
         );
         
+        console.log('✅ Booking created successfully with ID:', result.insertId);
         res.status(201).json({ message: 'Đặt phòng thành công! Vui lòng chờ xác nhận từ nhân viên.', bookingId: result.insertId });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        console.error('❌ Booking creation error:', error);
+        res.status(500).json({ message: 'Lỗi server: ' + error.message });
     }
 });
 
@@ -659,10 +683,10 @@ app.put('/api/bookings/:id/status', authenticateToken, async (req, res) => {
         
         const booking = bookings[0];
 
-        // Admin và staff có thể cập nhật mọi trạng thái
+        // Admin và staff có toàn quyền với mọi booking
         if (user.role === 'admin' || user.role === 'staff') {
             console.log(`🔧 Admin/Staff ${user.username} updating booking ${id} to ${status}`);
-            // Admin có full quyền, không cần kiểm tra gì thêm
+            // Admin có full quyền, có thể thay đổi bất kỳ trạng thái nào của bất kỳ booking nào
         } else if (user.role === 'customer') {
             // Khách hàng chỉ được hủy phòng của mình
             if (status !== 'cancelled') {
@@ -1179,16 +1203,28 @@ app.get('/api/admin/feedback', authenticateToken, async (req, res) => {
 // Invoices routes
 app.get('/api/admin/invoices', authenticateToken, requireAdmin, async (req, res) => {
     try {
-        const [invoices] = await pool.execute('SELECT * FROM invoices ORDER BY created_at DESC');
+        const [invoices] = await pool.execute(`
+            SELECT 
+                i.*,
+                COALESCE(b.room_number, 'N/A') as room_number,
+                COALESCE(i.room_name, b.room_name, 'Không xác định') as room_name,
+                COALESCE(b.created_at, i.created_at) as booking_date
+            FROM invoices i
+            LEFT JOIN bookings b ON i.booking_id = b.id
+            ORDER BY i.created_at DESC
+        `);
+        
+        console.log('Invoices data sample:', invoices.slice(0, 2));
         res.json({ invoices });
     } catch (error) {
+        console.error('Invoice API error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
 
 app.post('/api/admin/invoices', authenticateToken, requireAdmin, async (req, res) => {
     try {
-        const { booking_id, customer_name, room_charges, services } = req.body;
+        const { booking_id, customer_name, customer_phone, payment_method, room_charges, services } = req.body;
         
         console.log('Tạo hóa đơn với dữ liệu:', { booking_id, customer_name, room_charges, services });
         
@@ -1217,8 +1253,8 @@ app.post('/api/admin/invoices', authenticateToken, requireAdmin, async (req, res
         const total_amount = parseFloat(room_charges) + service_charges;
         
         const [result] = await pool.execute(
-            'INSERT INTO invoices (booking_id, customer_name, room_charges, service_charges, total_amount, status) VALUES (?, ?, ?, ?, ?, ?)',
-            [booking_id, customer_name, parseFloat(room_charges), service_charges, total_amount, 'pending']
+            'INSERT INTO invoices (booking_id, customer_name, customer_phone, payment_method, room_charges, service_charges, total_amount, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [booking_id, customer_name, customer_phone, payment_method, parseFloat(room_charges), service_charges, total_amount, 'pending']
         );
         
         if (services && services.length > 0) {
@@ -1234,6 +1270,22 @@ app.post('/api/admin/invoices', authenticateToken, requireAdmin, async (req, res
     } catch (error) {
         console.error('Lỗi tạo hóa đơn:', error);
         res.status(500).json({ message: 'Lỗi server: ' + error.message });
+    }
+});
+
+app.put('/api/admin/invoices/:id', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { customer_name, customer_phone, payment_method, room_charges, reason } = req.body;
+        
+        await pool.execute(
+            'UPDATE invoices SET customer_name = ?, customer_phone = ?, payment_method = ?, room_charges = ?, total_amount = ? WHERE id = ?',
+            [customer_name, customer_phone, payment_method, parseFloat(room_charges), parseFloat(room_charges), id]
+        );
+        
+        res.json({ message: 'Cập nhật hóa đơn thành công' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
@@ -1341,6 +1393,139 @@ app.get('/api/admin/logs', authenticateToken, requireAdmin, async (req, res) => 
         );
         res.json({ logs });
     } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Revenue routes
+app.get('/api/admin/revenue', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { period = 'month', year, month } = req.query;
+        
+        let dateFilter = '';
+        let params = [];
+        
+        if (period === 'year' && year) {
+            dateFilter = 'WHERE YEAR(created_at) = ?';
+            params.push(year);
+        } else if (period === 'month' && year && month) {
+            dateFilter = 'WHERE YEAR(created_at) = ? AND MONTH(created_at) = ?';
+            params.push(year, month);
+        } else {
+            // Default: current month
+            dateFilter = 'WHERE YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())';
+        }
+        
+        // Tổng doanh thu từ bookings đã hoàn thành
+        const [totalRevenue] = await pool.execute(`
+            SELECT 
+                COALESCE(SUM(total_amount), 0) as total,
+                COUNT(*) as booking_count
+            FROM bookings 
+            ${dateFilter} AND status IN ('checked_out', 'confirmed')
+        `, params);
+        
+        // Doanh thu theo ngày
+        const [dailyRevenue] = await pool.execute(`
+            SELECT 
+                DATE(created_at) as date,
+                SUM(total_amount) as revenue,
+                COUNT(*) as bookings
+            FROM bookings 
+            ${dateFilter} AND status IN ('checked_out', 'confirmed')
+            GROUP BY DATE(created_at)
+            ORDER BY date DESC
+            LIMIT 30
+        `, params);
+        
+        // Doanh thu theo loại phòng
+        const [roomTypeRevenue] = await pool.execute(`
+            SELECT 
+                room_type,
+                SUM(total_amount) as revenue,
+                COUNT(*) as bookings
+            FROM bookings 
+            ${dateFilter} AND status IN ('checked_out', 'confirmed')
+            GROUP BY room_type
+            ORDER BY revenue DESC
+        `, params);
+        
+        // Doanh thu từ dịch vụ
+        const [serviceRevenue] = await pool.execute(`
+            SELECT 
+                COALESCE(SUM(ins.total), 0) as service_revenue,
+                COUNT(DISTINCT ins.invoice_id) as service_invoices
+            FROM invoice_services ins
+            JOIN invoices i ON ins.invoice_id = i.id
+            JOIN bookings b ON i.booking_id = b.id
+            ${dateFilter.replace('created_at', 'b.created_at')}
+        `, params);
+        
+        // Top khách hàng
+        const [topCustomers] = await pool.execute(`
+            SELECT 
+                customer_name,
+                customer_phone,
+                SUM(total_amount) as total_spent,
+                COUNT(*) as booking_count
+            FROM bookings 
+            ${dateFilter} AND status IN ('checked_out', 'confirmed')
+            GROUP BY customer_name, customer_phone
+            ORDER BY total_spent DESC
+            LIMIT 10
+        `, params);
+        
+        res.json({
+            summary: {
+                totalRevenue: totalRevenue[0].total,
+                totalBookings: totalRevenue[0].booking_count,
+                serviceRevenue: serviceRevenue[0].service_revenue,
+                serviceInvoices: serviceRevenue[0].service_invoices
+            },
+            dailyRevenue,
+            roomTypeRevenue,
+            topCustomers
+        });
+    } catch (error) {
+        console.error('Revenue API error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Revenue summary for dashboard
+app.get('/api/admin/revenue/summary', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        // Doanh thu hôm nay
+        const [todayRevenue] = await pool.execute(`
+            SELECT COALESCE(SUM(total_amount), 0) as revenue
+            FROM bookings 
+            WHERE DATE(created_at) = CURDATE() AND status IN ('checked_out', 'confirmed')
+        `);
+        
+        // Doanh thu tháng này
+        const [monthRevenue] = await pool.execute(`
+            SELECT COALESCE(SUM(total_amount), 0) as revenue
+            FROM bookings 
+            WHERE YEAR(created_at) = YEAR(CURDATE()) 
+            AND MONTH(created_at) = MONTH(CURDATE()) 
+            AND status IN ('checked_out', 'confirmed')
+        `);
+        
+        // Doanh thu năm này
+        const [yearRevenue] = await pool.execute(`
+            SELECT COALESCE(SUM(total_amount), 0) as revenue
+            FROM bookings 
+            WHERE YEAR(created_at) = YEAR(CURDATE()) 
+            AND status IN ('checked_out', 'confirmed')
+        `);
+        
+        res.json({
+            today: todayRevenue[0].revenue,
+            month: monthRevenue[0].revenue,
+            year: yearRevenue[0].revenue
+        });
+    } catch (error) {
+        console.error('Revenue summary error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });

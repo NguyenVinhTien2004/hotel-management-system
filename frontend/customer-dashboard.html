@@ -552,7 +552,7 @@
             </div>
 
             <div class="greeting">
-                <h2 id="userGreeting">Xin chào Khách hàng,</h2>
+                <h2 id="userGreeting">Xin chào Khách hàng - DASHBOARD MỚI,</h2>
                 <p>Khám phá những khách sạn tuyệt vời</p>
             </div>
 
@@ -814,7 +814,10 @@
             localStorage.setItem('selectedRoom', JSON.stringify(selectedRoom));
             // Set callback to refresh dashboard after booking
             localStorage.setItem('refreshDashboard', 'true');
-            window.location.href = 'customer-booking.html';
+            
+            // Force redirect with timestamp to avoid cache
+            const timestamp = new Date().getTime();
+            window.location.href = `customer-booking.html?v=${timestamp}`;
         }
 
         // Search rooms

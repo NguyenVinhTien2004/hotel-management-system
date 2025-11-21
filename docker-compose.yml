@@ -1,0 +1,19 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: hotel-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: quanlykhachsan
+      MYSQL_USER: hotel_user
+      MYSQL_PASSWORD: hotel_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/database_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./backend/reset_rooms_20.sql:/docker-entrypoint-initdb.d/02-rooms.sql
+    restart: unless-stopped
+
+volumes:
+  mysql_data:

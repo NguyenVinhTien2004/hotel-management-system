@@ -3,7 +3,7 @@ const API_URL = typeof AppConfig !== 'undefined' ? AppConfig.getApiUrl() : (() =
     if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
         return `http://${window.location.hostname}:3001/api`;
     }
-    return 'http://localhost:3001/api';
+    return AppConfig.getApiUrl();
 })();
 
 console.log('Admin Dashboard API URL:', API_URL);
@@ -56,6 +56,8 @@ function showTab(tabName) {
             'bookings': 'customer-dropdown', 
             'rooms': 'resource-dropdown',
             'services': 'resource-dropdown',
+            'revenue': 'finance-dropdown',
+            'invoices': 'finance-dropdown',
             'feedback': 'report-dropdown',
             'logs': 'report-dropdown'
         };
@@ -92,6 +94,10 @@ function showTab(tabName) {
             break;
         case 'logs':
             loadLogs();
+            break;
+        case 'revenue':
+            loadRevenueSummary();
+            loadRevenueData();
             break;
     }
 }
@@ -184,7 +190,10 @@ function displayInvoices(invoices) {
         <tr>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${invoice.id}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${invoice.customer_name}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${invoice.room_number}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <div class="font-medium">${invoice.room_name || 'Không xác định'}</div>
+                <div class="text-xs text-gray-500">${invoice.room_number || ''}</div>
+            </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatCurrency(invoice.room_charges)}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatCurrency(invoice.service_charges)}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${formatCurrency(invoice.total_amount)}</td>
@@ -287,7 +296,8 @@ function displayBookings(bookings) {
                 </select>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <button onclick="viewBookingDetails(${booking.id})" class="text-blue-600 hover:text-blue-900">Xem chi tiết</button>
+                <button onclick="viewBookingDetails(${booking.id})" class="text-blue-600 hover:text-blue-900 mr-2">Xem chi tiết</button>
+                ${booking.status !== 'cancelled' ? `<button onclick="cancelBooking(${booking.id})" class="text-red-600 hover:text-red-900">Hủy phòng</button>` : ''}
             </td>
         </tr>
     `).join('');
@@ -302,6 +312,15 @@ function getStatusSelectColor(status) {
         'cancelled': 'bg-red-50 text-red-800'
     };
     return colors[status] || 'bg-gray-50 text-gray-800';
+}
+
+async function cancelBooking(bookingId) {
+    const reason = prompt('Nhập lý do hủy phòng:');
+    if (!reason) return;
+    
+    if (!confirm('Bạn có chắc chắn muốn hủy đặt phòng này?')) return;
+    
+    await updateBookingStatus(bookingId, 'cancelled');
 }
 
 async function updateBookingStatus(bookingId, newStatus) {
@@ -324,7 +343,8 @@ async function updateBookingStatus(bookingId, newStatus) {
             const result = await response.json();
             console.log('Update success:', result);
             loadBookings();
-            alert('Cập nhật trạng thái thành công!');
+            const message = newStatus === 'cancelled' ? 'Hủy phòng thành công!' : 'Cập nhật trạng thái thành công!';
+            alert(message);
         } else {
             const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
             console.error('Update error:', response.status, errorData);
@@ -654,6 +674,12 @@ function showAddInvoiceModal() {
 function hideAddInvoiceModal() {
     document.getElementById('addInvoiceModal').classList.add('hidden');
     document.getElementById('addInvoiceForm').reset();
+    
+    // Reset lại tiêu đề và nút về trạng thái tạo mới
+    document.querySelector('#addInvoiceModal h3').textContent = 'Tạo hóa đơn mới';
+    const submitBtn = document.querySelector('#addInvoiceForm button[type="submit"]');
+    submitBtn.textContent = 'Tạo hóa đơn';
+    submitBtn.removeAttribute('data-edit-id');
 }
 
 // Service form handler
@@ -721,28 +747,48 @@ document.getElementById('addInvoiceForm').addEventListener('submit', async (e) =
     e.preventDefault();
     
     const token = localStorage.getItem('token');
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const editId = submitBtn.getAttribute('data-edit-id');
+    
     const formData = {
         booking_id: parseInt(document.getElementById('bookingId').value),
         customer_name: document.getElementById('customerNameInvoice').value,
+        customer_phone: document.getElementById('customerPhone').value,
+        payment_method: document.getElementById('paymentMethod').value,
         room_charges: parseFloat(document.getElementById('roomCharges').value),
         reason: document.getElementById('invoiceReason').value,
         services: []
     };
     
     try {
-        const response = await fetch(`${API_URL}/admin/invoices`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(formData)
-        });
+        let response;
+        if (editId) {
+            // Sửa hóa đơn
+            response = await fetch(`${API_URL}/admin/invoices/${editId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(formData)
+            });
+        } else {
+            // Tạo hóa đơn mới
+            response = await fetch(`${API_URL}/admin/invoices`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(formData)
+            });
+        }
         
         if (response.ok) {
             hideAddInvoiceModal();
             loadInvoices();
-            alert('Tạo hóa đơn thành công!');
+            alert(editId ? 'Cập nhật hóa đơn thành công!' : 'Tạo hóa đơn thành công!');
+            submitBtn.removeAttribute('data-edit-id');
         } else {
             const error = await response.json();
             alert(error.message || 'Có lỗi xảy ra');
@@ -753,6 +799,43 @@ document.getElementById('addInvoiceForm').addEventListener('submit', async (e) =
 });
 
 // Delete functions
+async function editInvoice(id) {
+    // Tìm hóa đơn cần sửa
+    const invoiceRows = document.querySelectorAll('#invoicesTableBody tr');
+    let invoice = null;
+    
+    invoiceRows.forEach(row => {
+        if (row.cells[0].textContent == id) {
+            invoice = {
+                id: id,
+                customer_name: row.cells[1].textContent,
+                room_charges: row.cells[3].textContent.replace(/[^0-9]/g, ''),
+                service_charges: row.cells[4].textContent.replace(/[^0-9]/g, '')
+            };
+        }
+    });
+    
+    if (!invoice) {
+        alert('Không tìm thấy hóa đơn');
+        return;
+    }
+    
+    // Điền thông tin vào form
+    document.getElementById('customerNameInvoice').value = invoice.customer_name;
+    document.getElementById('customerPhone').value = invoice.customer_phone || '';
+    document.getElementById('paymentMethod').value = invoice.payment_method || 'cash';
+    document.getElementById('roomCharges').value = invoice.room_charges;
+    document.getElementById('bookingId').value = id;
+    
+    // Thay đổi tiêu đề và nút
+    document.querySelector('#addInvoiceModal h3').textContent = 'Sửa hóa đơn';
+    const submitBtn = document.querySelector('#addInvoiceForm button[type="submit"]');
+    submitBtn.textContent = 'Cập nhật';
+    submitBtn.setAttribute('data-edit-id', id);
+    
+    showAddInvoiceModal();
+}
+
 async function deleteInvoice(id) {
     const reason = prompt('Nhập lý do xóa hóa đơn:');
     if (!reason) return;
@@ -1058,12 +1141,28 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Using API URL:', API_URL);
     
     checkAuth();
-    showTab('feedback'); // Hiển thị tab đầu tiên
+    showTab('revenue'); // Hiển thị tab doanh thu đầu tiên
     loadRealNotifications(); // Load thông báo thực
     
     // Tự động cập nhật thông báo mỗi 30 giây
     setInterval(loadRealNotifications, 30000);
-
+    
+    // Handle period change for revenue
+    const periodSelect = document.getElementById('revenuePeriod');
+    const customInputs = document.getElementById('customDateInputs');
+    
+    if (periodSelect) {
+        periodSelect.addEventListener('change', (e) => {
+            if (e.target.value === 'custom') {
+                customInputs.classList.remove('hidden');
+                // Set default values
+                document.getElementById('revenueYear').value = new Date().getFullYear();
+                document.getElementById('revenueMonth').value = new Date().getMonth() + 1;
+            } else {
+                customInputs.classList.add('hidden');
+            }
+        });
+    }
 });
 
 // Hệ thống thông báo mới
@@ -1355,6 +1454,119 @@ function getStatusText(status) {
     };
     return texts[status] || status;
 }
+
+// Revenue functions
+async function loadRevenueSummary() {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`${API_URL}/admin/revenue/summary`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('todayRevenue').textContent = formatCurrency(data.today);
+            document.getElementById('monthRevenue').textContent = formatCurrency(data.month);
+            document.getElementById('yearRevenue').textContent = formatCurrency(data.year);
+        }
+    } catch (error) {
+        console.error('Error loading revenue summary:', error);
+    }
+}
+
+async function loadRevenueData() {
+    const token = localStorage.getItem('token');
+    const period = document.getElementById('revenuePeriod').value;
+    const year = document.getElementById('revenueYear').value;
+    const month = document.getElementById('revenueMonth').value;
+    
+    let url = `${API_URL}/admin/revenue?period=${period}`;
+    if (period === 'custom' && year) {
+        url += `&year=${year}`;
+        if (month) {
+            url += `&month=${month}`;
+        }
+    } else if (period === 'year') {
+        url += `&year=${new Date().getFullYear()}`;
+    }
+    
+    try {
+        const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            displayRevenueData(data);
+        }
+    } catch (error) {
+        console.error('Error loading revenue data:', error);
+    }
+}
+
+function displayRevenueData(data) {
+    const { summary, dailyRevenue, roomTypeRevenue, topCustomers } = data;
+    
+    // Update summary stats
+    document.getElementById('totalRevenue').textContent = formatCurrency(summary.totalRevenue);
+    document.getElementById('totalBookings').textContent = summary.totalBookings;
+    document.getElementById('serviceRevenue').textContent = formatCurrency(summary.serviceRevenue);
+    
+    const avgRevenue = summary.totalBookings > 0 ? summary.totalRevenue / summary.totalBookings : 0;
+    document.getElementById('avgRevenue').textContent = formatCurrency(avgRevenue);
+    
+    // Display daily revenue
+    const dailyTable = document.getElementById('dailyRevenueTable');
+    dailyTable.innerHTML = dailyRevenue.map(day => `
+        <tr>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">${formatDate(day.date)}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-green-600">${formatCurrency(day.revenue)}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">${day.bookings}</td>
+        </tr>
+    `).join('');
+    
+    // Display room type revenue
+    const roomTypeContainer = document.getElementById('roomTypeRevenue');
+    const maxRevenue = Math.max(...roomTypeRevenue.map(r => r.revenue));
+    
+    roomTypeContainer.innerHTML = roomTypeRevenue.map(room => {
+        const percentage = maxRevenue > 0 ? (room.revenue / maxRevenue) * 100 : 0;
+        return `
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex-1">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-medium text-gray-900">${room.room_type}</span>
+                        <span class="text-sm font-bold text-green-600">${formatCurrency(room.revenue)}</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width: ${percentage}%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">${room.bookings} booking</p>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Display top customers
+    const customersTable = document.getElementById('topCustomersTable');
+    customersTable.innerHTML = topCustomers.map((customer, index) => `
+        <tr>
+            <td class="px-4 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-sm font-medium text-blue-600">${index + 1}</span>
+                    </div>
+                    <span class="text-sm font-medium text-gray-900">${customer.customer_name}</span>
+                </div>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">${customer.customer_phone}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-green-600">${formatCurrency(customer.total_spent)}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">${customer.booking_count}</td>
+        </tr>
+    `).join('');
+}
+
+
 
 // Đóng modal khi click bên ngoài
 document.addEventListener('click', (e) => {

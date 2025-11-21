@@ -22,7 +22,7 @@
    - node server.js
 
 3. CHẠY FRONTEND:
-   - Mở trình duyệt và truy cập: http://localhost:3000
+   - Mở trình duyệt và truy cập: http://localhost:3001
    - HOẶC click chuột phải vào file index.html và chọn "Open with Live Server"
    - Lưu ý: Frontend được serve trực tiếp từ backend server (port 3001)
    

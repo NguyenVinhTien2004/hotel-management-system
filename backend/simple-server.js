@@ -1,26 +1,49 @@
 const express = require('express');
 const cors = require('cors');
-const mysql = require('mysql2/promise');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const path = require('path');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
+const JWT_SECRET = 'hotel-secret-key';
 
-// Database config
-const dbConfig = {
-    host: 'localhost',
-    user: 'root',
-    password: '123456789@',
-    database: 'quanlykhachsan',
-    port: 3306
-};
+// In-memory database for testing
+let users = [
+    {
+        id: 1,
+        username: 'admin',
+        name: 'Administrator',
+        email: 'admin@hotel.com',
+        password: 'admin123', // plain text for testing
+        role: 'admin'
+    },
+    {
+        id: 2,
+        username: 'customer',
+        name: 'Customer Test',
+        email: 'customer@hotel.com',
+        password: 'customer123',
+        role: 'customer'
+    }
+];
 
-// Create connection pool
-const pool = mysql.createPool({
-    ...dbConfig,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-});
+let rooms = [
+    { id: 1, number: '101', name: 'Phòng Đơn Tiêu Chuẩn', type: 'Đơn', price: 500000, capacity: 1, status: 'available' },
+    { id: 2, number: '102', name: 'Phòng Đôi Tiêu Chuẩn', type: 'Đôi', price: 800000, capacity: 2, status: 'available' },
+    { id: 3, number: '201', name: 'Phòng Gia Đình', type: 'Gia Đình', price: 1200000, capacity: 4, status: 'available' },
+    { id: 4, number: '301', name: 'Phòng VIP', type: 'VIP', price: 2000000, capacity: 2, status: 'available' }
+];
+
+let services = [
+    { id: 1, name: 'Giặt ủi', price: 50000, category: 'laundry', description: 'Dịch vụ giặt ủi chuyên nghiệp' },
+    { id: 2, name: 'Massage', price: 200000, category: 'spa', description: 'Dịch vụ massage thư giãn' },
+    { id: 3, name: 'Xe đưa đón sân bay', price: 300000, category: 'transport', description: 'Đưa đón từ/đến sân bay' },
+    { id: 4, name: 'Phục vụ phòng', price: 100000, category: 'other', description: 'Dịch vụ dọn dẹp phòng' }
+];
+
+let bookings = [];
+let bookingIdCounter = 1;
 
 app.use(cors({
     origin: '*',
@@ -29,175 +52,287 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Serve static files
-app.use(express.static(__dirname + '/../frontend'));
-
-// Test route
-app.get('/api/test', (req, res) => {
-    res.json({ message: 'Server hoạt động tốt!', timestamp: new Date() });
+// Request logging
+app.use((req, res, next) => {
+    console.log(`📥 ${req.method} ${req.path} - ${new Date().toLocaleTimeString()}`);
+    next();
 });
+
+// Auth middleware
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ message: 'Access token required' });
+    }
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ message: 'Invalid token' });
+        }
+        req.user = user;
+        next();
+    });
+};
 
 // Auth routes
 app.post('/api/auth/login', async (req, res) => {
     try {
-        console.log('🔐 Login request:', req.body);
         const { username, password } = req.body;
         
-        // Simple auth for testing
-        if (username && password) {
-            const user = {
-                id: 1,
-                username: username,
-                name: username,
-                email: `${username}@hotel.com`,
-                role: 'customer'
-            };
-            
-            const token = 'simple-token-' + Date.now();
-            
-            console.log('✅ Login successful for:', username);
-            res.json({ token, user });
-        } else {
-            res.status(401).json({ message: 'Invalid credentials' });
+        const user = users.find(u => u.username === username);
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
-    } catch (error) {
-        console.error('❌ Login error:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-});
+        
+        if (password !== user.password) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
 
-app.post('/api/auth/register', async (req, res) => {
-    try {
-        console.log('📝 Register request:', req.body);
-        res.status(201).json({ message: 'Đăng ký thành công' });
-    } catch (error) {
-        console.error('❌ Register error:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-});
+        const token = jwt.sign(
+            { id: user.id, username: user.username, role: user.role },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
 
-// Dashboard stats route - simplified
-app.get('/api/dashboard/stats', async (req, res) => {
-    try {
-        console.log('📊 Dashboard stats request received');
-        
-        // Simple queries without authentication for testing
-        const [rooms] = await pool.execute("SELECT COUNT(*) as count FROM rooms WHERE status = 'available'");
-        console.log('✅ Rooms query successful:', rooms[0]);
-        
-        const [bookings] = await pool.execute("SELECT COUNT(*) as count FROM bookings");
-        console.log('✅ Bookings query successful:', bookings[0]);
-        
-        const stats = {
-            availableRooms: rooms[0].count,
-            totalBookings: bookings[0].count,
-            myBookings: 0,
-            myFeedbacks: 0,
-            totalServices: 0
-        };
-        
-        console.log('📊 Sending stats:', stats);
-        res.json(stats);
-        
-    } catch (error) {
-        console.error('❌ Dashboard stats error:', error);
-        res.status(500).json({ 
-            message: 'Server error', 
-            error: error.message,
-            stack: error.stack 
+        res.json({
+            token,
+            user: {
+                id: user.id,
+                username: user.username,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
         });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Rooms route - simplified
-app.get('/api/rooms', async (req, res) => {
+app.post('/api/auth/admin-login', async (req, res) => {
     try {
-        console.log('🏨 Rooms request received');
+        const { username, password } = req.body;
         
-        const [rooms] = await pool.execute('SELECT * FROM rooms LIMIT 10');
-        console.log('✅ Found', rooms.length, 'rooms');
+        const user = users.find(u => u.username === username && (u.role === 'admin' || u.role === 'staff'));
+        if (!user) {
+            return res.status(401).json({ message: 'Tài khoản không tồn tại hoặc không có quyền truy cập' });
+        }
         
-        res.json({ rooms });
-        
-    } catch (error) {
-        console.error('❌ Rooms error:', error);
-        res.status(500).json({ 
-            message: 'Server error', 
-            error: error.message 
+        if (password !== user.password) {
+            return res.status(401).json({ message: 'Mật khẩu không đúng' });
+        }
+
+        const token = jwt.sign(
+            { id: user.id, username: user.username, role: user.role },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.json({
+            token,
+            user: {
+                id: user.id,
+                username: user.username,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
         });
-    }
-});
-
-// Bookings route
-app.get('/api/bookings', async (req, res) => {
-    try {
-        console.log('📅 Bookings request received');
-        const [bookings] = await pool.execute('SELECT * FROM bookings ORDER BY created_at DESC LIMIT 10');
-        console.log('✅ Found', bookings.length, 'bookings');
-        res.json({ bookings });
     } catch (error) {
-        console.error('❌ Bookings error:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Services route
-app.get('/api/services', async (req, res) => {
+// Rooms routes
+app.get('/api/rooms', (req, res) => {
     try {
-        console.log('🛎️ Services request received');
-        const [services] = await pool.execute('SELECT * FROM services ORDER BY created_at DESC LIMIT 10');
-        console.log('✅ Found', services.length, 'services');
+        const { status, type } = req.query;
+        let filteredRooms = rooms;
+        
+        if (status) {
+            filteredRooms = filteredRooms.filter(room => room.status === status);
+        }
+        
+        if (type) {
+            filteredRooms = filteredRooms.filter(room => room.type === type);
+        }
+        
+        res.json({ rooms: filteredRooms });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Services routes
+app.get('/api/services', (req, res) => {
+    try {
         res.json({ services });
     } catch (error) {
-        console.error('❌ Services error:', error);
-        // Return empty services if table doesn't exist
-        res.json({ services: [] });
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Feedback route
-app.post('/api/feedback', async (req, res) => {
+// Bookings routes
+app.get('/api/bookings', authenticateToken, (req, res) => {
     try {
-        console.log('⭐ Feedback request:', req.body);
-        res.status(201).json({ message: 'Cảm ơn bạn đã đánh giá!' });
+        res.json({ bookings });
     } catch (error) {
-        console.error('❌ Feedback error:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Notifications route - simplified
-app.get('/api/notifications', async (req, res) => {
+app.post('/api/bookings', authenticateToken, (req, res) => {
     try {
-        console.log('🔔 Notifications request received');
-        const notifications = [];
-        console.log('✅ Sending notifications:', notifications.length);
-        res.json({ notifications });
+        const { customer_name, customer_phone, customer_email, room_id, check_in, check_out, guest_count, payment_method, selected_services } = req.body;
+        
+        const room = rooms.find(r => r.id == room_id);
+        if (!room) {
+            return res.status(404).json({ message: 'Phòng không tồn tại' });
+        }
+        
+        if (room.status !== 'available') {
+            return res.status(400).json({ message: 'Phòng không có sẵn' });
+        }
+        
+        const checkInDate = new Date(check_in);
+        const checkOutDate = new Date(check_out);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (checkInDate < today) {
+            return res.status(400).json({ message: 'Ngày nhận phòng không thể là quá khứ' });
+        }
+        
+        if (checkOutDate <= checkInDate) {
+            return res.status(400).json({ message: 'Ngày trả phòng phải sau ngày nhận phòng' });
+        }
+        
+        const nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
+        const roomAmount = room.price * nights;
+        
+        let servicesAmount = 0;
+        if (selected_services && selected_services.length > 0) {
+            servicesAmount = selected_services.reduce((sum, service) => sum + service.price, 0);
+        }
+        
+        const totalAmount = roomAmount + servicesAmount;
+
+        const booking = {
+            id: bookingIdCounter++,
+            customer_name,
+            customer_phone,
+            customer_email,
+            room_id,
+            room_number: room.number,
+            room_name: room.name,
+            room_type: room.type,
+            check_in,
+            check_out,
+            guest_count,
+            total_amount: totalAmount,
+            payment_method: payment_method || 'cash',
+            status: 'pending',
+            created_at: new Date().toISOString()
+        };
+        
+        bookings.push(booking);
+        
+        // Update room status
+        room.status = 'occupied';
+        
+        res.status(201).json({ message: 'Đặt phòng thành công! Vui lòng chờ xác nhận từ nhân viên.', bookingId: booking.id });
     } catch (error) {
-        console.error('❌ Notifications error:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error('Booking error:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Start server
+app.put('/api/bookings/:id/status', authenticateToken, (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        
+        const booking = bookings.find(b => b.id == id);
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+        
+        booking.status = status;
+        
+        if (status === 'cancelled' || status === 'checked_out') {
+            const room = rooms.find(r => r.id == booking.room_id);
+            if (room) {
+                room.status = 'available';
+            }
+        }
+        
+        res.json({ message: 'Cập nhật trạng thái thành công' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Dashboard stats
+app.get('/api/dashboard/stats', authenticateToken, (req, res) => {
+    try {
+        const availableRooms = rooms.filter(r => r.status === 'available').length;
+        const totalServices = services.length;
+        const myBookings = bookings.filter(b => b.status === 'pending' || b.status === 'confirmed').length;
+        const myFeedbacks = 0; // Simplified
+        
+        res.json({
+            availableRooms,
+            totalServices,
+            myBookings,
+            myFeedbacks
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Dashboard activities
+app.get('/api/dashboard/activities', authenticateToken, (req, res) => {
+    try {
+        const activities = bookings.slice(-5).map(booking => ({
+            type: 'booking',
+            title: `Đặt phòng ${booking.room_number}`,
+            description: `${booking.status} - ${booking.room_name}`,
+            time: booking.created_at,
+            icon: '📅',
+            status: booking.status
+        }));
+        
+        res.json({ activities });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Redirect root to login page
+app.get('/', (req, res) => {
+    res.redirect('/index.html');
+});
+
+// 404 handler
+app.use((req, res) => {
+    if (req.path.startsWith('/api/')) {
+        res.status(404).json({ message: 'API endpoint not found' });
+    } else {
+        res.status(404).send('Page not found');
+    }
+});
+
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Simple server running on port ${PORT}`);
-    console.log('🌐 Test URL: http://localhost:3001/api/test');
-    console.log('📊 Dashboard: http://localhost:3001/api/dashboard/stats');
-    console.log('🏨 Rooms: http://localhost:3001/api/rooms');
-    console.log('🔔 Notifications: http://localhost:3001/api/notifications');
+    console.log(`🚀 Simple Server đang chạy trên port ${PORT}`);
+    console.log('✅ Sử dụng In-Memory database (không cần MySQL)');
+    console.log(`🌐 Frontend: http://localhost:${PORT}`);
+    console.log('👤 Admin login: admin/password');
+    console.log('🔍 Console logging enabled');
 });
 
-// Test database connection on startup
-async function testConnection() {
-    try {
-        const connection = await pool.getConnection();
-        console.log('✅ Database connected successfully!');
-        connection.release();
-    } catch (error) {
-        console.error('❌ Database connection failed:', error.message);
-    }
-}
-
-testConnection();
+module.exports = app;
