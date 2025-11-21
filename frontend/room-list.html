@@ -267,7 +267,7 @@
                             <p class="text-sm text-gray-600">Phòng ${room.number} • ${room.type} • ${room.capacity} người</p>
                         </div>
                         <div class="mb-4">
-                            <div class="text-2xl font-bold text-green-600 text-glow">${room.price.toLocaleString('vi-VN')} VND</div>
+                            <div class="text-2xl font-bold text-green-600 text-glow">${parseInt(room.price).toLocaleString('vi-VN')} VND</div>
                             <div class="text-sm text-gray-500">mỗi đêm</div>
                         </div>
                         <div class="space-y-2">
@@ -315,7 +315,7 @@
                         <div class="text-sm text-gray-600">Phòng ${room.number} • ${room.type} • ${room.capacity} người</div>
                     </div>
                     <div class="text-right">
-                        <div class="font-bold text-green-600">${room.price.toLocaleString('vi-VN')} VND</div>
+                        <div class="font-bold text-green-600">${parseInt(room.price).toLocaleString('vi-VN')} VND</div>
                         <div class="text-xs text-gray-500">mỗi đêm</div>
                     </div>
                 </div>
@@ -369,7 +369,7 @@
             
             // Cập nhật thông tin modal
             document.getElementById('modalRoomName').textContent = room.name;
-            document.getElementById('modalRoomPrice').textContent = room.price.toLocaleString('vi-VN') + ' VND/đêm';
+            document.getElementById('modalRoomPrice').textContent = parseInt(room.price).toLocaleString('vi-VN') + ' VND/đêm';
             document.getElementById('modalRoomLocation').textContent = `${room.capacity} người • ${room.type}`;
             document.getElementById('modalRoomRating').textContent = `4.${Math.floor(Math.random() * 9) + 1} Ratings`;
             document.getElementById('modalRoomDescription').textContent = room.description || 'Phòng thoải mái với thiết kế hiện đại, đầy đủ tiện nghi cao cấp.';
